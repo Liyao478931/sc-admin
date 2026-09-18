@@ -1,149 +1,198 @@
+
+
 # 数智管控平台（SC Admin）
 
-面向制造/装备企业的数智管控平台：人事、经营、仓储、生产、安全、设备、财务、审批、企业网盘等一体化管理，配套移动端 H5 与数据驾驶舱。
+## 项目简介
 
-本仓库为**加密交付包**（PHP 源码经 beast 加密），客户下载后自部署，30 天试用（自动绑定域名），满意后在授权平台购买授权码转正式。
+数智管控平台是一款面向制造与装备企业的数字化管理解决方案，涵盖人事管理、经营分析、仓储物流、生产制造、安全环保、设备运维、财务审批、企业网盘等核心业务模块。平台配套移动端 H5 应用与数据驾驶舱，支持多端协同办公，助力企业实现智能化管理与数字化转型。
 
----
-
-## 系统界面预览
-
-**后台登录页**
-
-![后台登录页](docs/screenshots/admin-login.png)
-
-**安全驾驶舱**（安全管理 · 深色科技大屏）
-
-![安全驾驶舱](docs/screenshots/safety-cockpit.png)
-
-**经营驾驶舱**（经营管理 · 数据大屏）
-
-![经营驾驶舱](docs/screenshots/biz-cockpit.png)
-
-**安全生产专题大屏**（LED 大屏展示）
-
-![安全生产专题大屏](docs/screenshots/safety-board.png)
-
-> 以上为演示环境界面（大屏数据为占位状态）；部署后登录后台即可查看实时业务数据。
+> **注意**：本源码经过 beast 加密处理，部署后可直接运行，无需额外解密。
 
 ---
 
-## 一、环境要求
+## 技术架构
 
-| 组件 | 要求 | 说明 |
-|---|---|---|
-| 操作系统 | CentOS 7+ / Ubuntu 18+ / 宝塔面板均可 | 已适配宝塔多版本 PHP |
-| Web 服务器 | Nginx（推荐）或 Apache | 站点 root 指向 `public/` |
-| PHP | **8.1.x（务必 8.1，见下文 beast 说明）** | 不要使用 8.0 / 8.2+，beast.so 与 PHP 8.1 绑定 |
-| MySQL | 5.7+ / 8.0（utf8mb4） | 安装向导自动建库 |
-| Redis | 任意版本（含密码） | 缓存/验证码依赖 |
+| 层级 | 技术选型 | 说明 |
+|------|----------|------|
+| 后端框架 | ThinkPHP 8.x | 企业级 PHP MVC 框架 |
+| PHP 版本 | 8.1.x | 必须使用 PHP 8.1（与 beast 扩展绑定） |
+| 数据库 | MySQL 5.7+ / 8.0 | 采用 utf8mb4 编码 |
+| 缓存 | Redis | 会话、权限、验证码等缓存管理 |
+| 前端框架 | Vue 3.x + Element Plus | 企业级后台管理系统 |
+| 认证机制 | JWT（JSON Web Token） | 无状态安全认证 |
+| 定时任务 | ThinkPHP Command | 业务调度与数据处理 |
 
-## 二、PHP 扩展清单（安装向导会自动检测）
+---
 
-必须开启以下扩展，缺一不可：
+## 核心功能模块
 
+### 智能应用（AI）
+- **智能客服 Agent**：AI 客服对话管理
+- **知识库管理**：向量知识库构建与检索
+- **AI 应用市场**：预置 AI 工具与应用模板
+- **工作流引擎**：可视化 AI 工作流编排
+- **数据洞察**：AI 预测与数据分析
+
+### 生产制造（Production）
+- **生产订单**：订单创建、跟踪与闭环管理
+- **工艺路线**：产品 BOM 与工艺流程配置
+- **生产调度**：排程计划与进度跟踪
+- **质量管控**：质检任务、报表与统计分析
+- **OEE 监控**：设备综合效率实时监控
+
+### 仓储物流（Warehouse）
+- **库存管理**：实时库存监控与预警
+- **出入库**：采购入库、销售出库、调拨管理
+- **盘点管理**：定期盘点与差异处理
+- **物料追溯**：全链路物料追踪
+- **库存分析**：库存周转与成本分析
+
+### 设备管理（Device）
+- **设备档案**：设备全生命周期管理
+- **设备巡检**：巡检计划与记录管理
+- **设备保养**：保养计划与执行跟踪
+- **设备维修**：报修流程与维修记录
+- **设备状态**：状态变更与看板展示
+
+### 安全管理（Safety）
+- **隐患排查**：隐患上报与整改闭环
+- **安全检查**：检查计划与执行记录
+- **风险评估**：风险辨识与分级管控
+- **事故管理**：事故调查与处理跟踪
+- **安全培训**：培训计划与考核记录
+
+### 人力资源（HR）
+- **员工管理**：员工档案与组织架构
+- **考勤管理**：排班、考勤记录与统计
+- **薪资核算**：工资条与薪资统计
+- **绩效评估**：考核模板与任务管理
+- **审批流程**：人事相关审批工作流
+
+### 财务管理（Finance）
+- **费用报销**：报销申请与审批
+- **合同管理**：合同签署与履约跟踪
+- **付款管理**：付款计划与执行
+- **财务报表**：经营数据分析与报表
+
+### 企业网盘（Drive）
+- **文件管理**：文件夹与文件操作
+- **权限控制**：细粒度访问权限管理
+- **分享协作**：文件共享与协作
+- **回收站**：误删文件恢复
+
+### 审批中心（Approval）
+- **自定义流程**：可视化流程配置
+- **多级审批**：支持会签、或签、转签
+- **移动审批**：H5 端便捷审批
+- **审批历史**：完整审批轨迹追溯
+
+### 移动端（Mobile）
+- **H5 应用**：适配移动端的工作界面
+- **消息推送**：实时通知与提醒
+- **扫码功能**：条码/二维码扫描识别
+- **定位服务**：地理位置相关功能
+
+---
+
+## 目录结构
+
+```
+sc-admin/
+├── app/                    # 应用核心代码（加密）
+│   ├── api/               # API 控制器
+│   │   ├── controller/    # 业务控制器
+│   │   ├── command/       # 命令行任务
+│   │   └── route/         # 路由定义
+│   ├── model/             # 数据模型
+│   ├── service/           # 业务服务层
+│   ├── middleware/        # 中间件
+│   ├── library/           # 公共类库
+│   └── common/            # 公共函数与 Trait
+├── database/              # 数据库相关
+│   ├── migrations/        # 数据迁移脚本
+│   └── seeds/             # 数据填充脚本
+├── public/                # Web 入口目录
+│   ├── admin/             # 后台前端资源
+│   └── index.php          # 入口文件
+├── config/                # 配置文件目录
+├── runtime/               # 运行时缓存
+├── storage/               # 存储目录
+├── database.sql           # 数据库初始化脚本
+├── install.sh             # beast 扩展安装脚本
+└── code_sync.php          # 授权验证驱动
+```
+
+---
+
+## 环境要求
+
+### 服务器要求
+- **操作系统**：CentOS 7+ / Ubuntu 18+ / 宝塔面板
+- **Web 服务器**：Nginx（推荐）或 Apache
+- **PHP 版本**：8.1.x（必须使用 PHP 8.1）
+- **数据库**：MySQL 5.7+ / 8.0（utf8mb4 编码）
+- **Redis**：任意版本（需配置密码）
+
+### PHP 扩展要求
 | 扩展 | 用途 |
-|---|---|
-| **beast**（随包提供，非 PHP 官方扩展） | 源码解密运行，**核心依赖**，见下方安装 |
+|------|------|
+| beast | 源码解密核心扩展（随包提供） |
 | pdo_mysql | 数据库连接 |
-| mbstring | 中文/多字节处理 |
-| openssl | 加密/授权签名校验 |
-| json | 接口数据 |
-| curl | 授权平台验证、外部请求 |
-| gd | 图片处理（验证码/头像/图片上传） |
+| mbstring | 中文处理 |
+| openssl | 加密与签名 |
+| curl | 网络请求 |
+| gd | 图片处理 |
 | fileinfo | 文件类型识别 |
-| zip | 压缩/导出 |
-| bcmath | 高精度计算（财务/成本） |
-| intl | 国际化/字符处理 |
-| redis | 缓存（验证码、权限、会话） |
-| xml / SimpleXML | 导入导出 |
+| zip | 压缩处理 |
+| redis | 缓存服务 |
+| json | 接口数据 |
 
-> 宝塔面板：软件商店 → PHP 8.1 → 安装扩展，勾选以上全部即可（beast 按下文单独装）。
+---
 
-## 三、PHP 配置项（php.ini）建议
+## 安装部署
 
-| 配置项 | 建议值 | 说明 |
-|---|---|---|
-| `memory_limit` | ≥ **256M**（建议 512M） | 安装向导硬性检测，低于 256M 会拦截 |
-| `file_uploads` | On | 文件上传 |
-| `allow_url_fopen` | On | 授权回调/远程请求 |
-| `post_max_size` / `upload_max_filesize` | ≥ 50M | 附件/凭证上传 |
-| `max_execution_time` | ≥ 300（CLI 不限） | 导入大 SQL、报表导出 |
-| `date.timezone` | Asia/Shanghai | 避免时间偏差 |
+### 1. 环境准备
 
-### ⚠️ 禁用函数（disable_functions）注意事项
+```bash
+# 安装 PHP 8.1 及所需扩展（宝塔面板可通过软件商店一键安装）
+# 安装 MySQL 5.7+ / 8.0
+# 安装 Redis 并配置密码
+```
 
-系统 PHP 层**不依赖** `exec` / `shell_exec` / `proc_open` 等命令执行函数，但仍请**不要禁用以下函数**，否则授权验证、文件上传、安装向导会失败：
-
-**严禁禁用：**
-- `curl_exec`（授权平台验证、远程请求）
-- `file_get_contents` / `file_put_contents`（授权回调、写缓存）
-- `copy` / `unlink` / `rename` / `mkdir` / `rmdir` / `chmod`（文件操作、热更新）
-- `password_hash` / `password_verify`（登录）
-- `random_bytes`（JWT/密钥生成）
-- `session_start` / `json_encode` / `json_decode`
-
-**可以禁用（不影响运行）：**
-- `shell_exec` / `exec` / `system` / `passthru` / `proc_open` / `popen` / `pcntl_exec` 等命令执行类
-- 若使用宝塔默认安全配置（已禁用 putenv/proc_open 等），无需调整，系统可正常运行。
-
-## 四、安装步骤
-
-### 1. 解压部署
-
-将仓库内容上传至站点目录（如 `/www/wwwroot/your-site`），**保留完整目录结构**：
+### 2. 上传代码
 
 ```bash
 cd /www/wwwroot
-# 方式一：git 克隆（需安装 git）
 git clone https://gitee.com/li-yao11111/sc-admin.git your-site
-# 方式二：下载压缩包解压
+# 或下载压缩包解压
 unzip sc-admin.zip -d your-site
-cd your-site
 ```
 
-### 2. 设置目录权限
+### 3. 设置权限
 
 ```bash
 chmod -R 777 config runtime public storage database
-chown -R www:www /www/wwwroot/your-site   # 宝塔默认运行用户为 www
+chown -R www:www /www/wwwroot/your-site
 ```
 
-> 安装向导会检测 `config / runtime / public / storage / database` 五个目录可写，权限不足会拦截。
-
-### 3. 创建数据库
-
-- 新建空数据库，编码选 **utf8mb4 / utf8mb4_unicode_ci**
-- 数据库账号需对库有 **ALL（增删改查建表）** 权限
-- 数据库名/账号/密码稍后在安装向导中填写（向导也支持自动建库）
-
-### 4. 安装 beast 扩展（核心）
+### 4. 安装 beast 扩展
 
 ```bash
 cd /www/wwwroot/your-site
 bash install.sh
 ```
 
-脚本会自动：定位 PHP 8.1 扩展目录 → 复制 `beast.so` → 写入 `php.ini` 启用扩展 → 提示重启 PHP-FPM。
-
-**完成后务必重启 PHP-FPM**：
-- 宝塔：软件商店 → PHP 8.1 → 服务 → 重启
-- 命令行：`systemctl restart php-fpm`（或宝塔对应命令）
-
-> ⚠️ **重要**：`beast.so` 与 PHP 版本严格绑定（当前为 PHP 8.1 编译）。若服务器 PHP 不是 8.1，请先切换/安装 PHP 8.1 再运行本脚本；否则安装后系统无法解密运行。
+安装完成后**重启 PHP-FPM**使扩展生效。
 
 ### 5. 配置 Nginx
-
-站点 root 指向 `public/`，并配置 ThinkPHP 伪静态：
 
 ```nginx
 server {
     listen 80;
     server_name your-domain.com;
-    root /www/wwwroot/your-site/public;   # ← 必须指向 public/
-    index index.php index.html;
+    root /www/wwwroot/your-site/public;
+    index index.php;
 
-    # 伪静态（重要：否则除首页外全部 404）
     location / {
         if (!-e $request_filename) {
             rewrite ^(.*)$ /index.php?s=$1 last;
@@ -151,75 +200,64 @@ server {
     }
 
     location ~ \.php(.*)$ {
-        fastcgi_pass unix:/tmp/php-cgi-81.sock;  # 宝塔：对应 PHP 8.1 的 sock
+        fastcgi_pass unix:/tmp/php-cgi-81.sock;
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         include fastcgi_params;
     }
 
-    location ~* \.(jpg|jpeg|png|gif|ico|css|js|woff2?|ttf|svg|mp4)$ {
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js|woff2?|ttf|svg)$ {
         expires 30d;
         access_log off;
     }
 
-    client_max_body_size 50m;   # 上传大小
+    client_max_body_size 50m;
 }
 ```
 
-- 宝塔面板：站点 → 设置 → 配置文件，粘贴上述 server 块（root 与伪静态为关键）
-- Apache 环境：开启 `mod_rewrite`，将 `.htaccess`（public/ 下已内置）启用即可
-
-配置完成后 `nginx -t` 测试并 reload。
-
 ### 6. 运行安装向导
 
-浏览器访问：**http://你的域名/install**
+浏览器访问 **http://你的域名/install**，按向导完成：
+1. 环境检测（PHP 版本、扩展、权限）
+2. 数据库配置（数据库信息 + Redis 密码）
+3. 管理员账号设置
+4. 执行安装（自动建表并生成 .env 配置）
 
-按四步完成：
-1. **环境检测**：PHP 版本、全部扩展、目录权限、PHP 配置逐项检测，全绿才可继续
-2. **数据库配置**：填写数据库主机/端口/库名/账号/密码 + **Redis 密码**（与服务器 Redis 一致）
-3. **管理员账号**：设置后台管理员用户名/密码/邮箱
-4. **执行安装**：自动导入数据表（约 1.2 万条语句 + 增量迁移）→ 生成 `.env`（含随机 JWT 密钥）→ 创建管理员 → 写入安装锁
+---
 
-安装完成自动跳转后台登录页（`/admin`）。
+## 许可证说明
 
-### 7. 授权（试用 → 正式）
+- **试用模式**：首次安装自动激活 30 天试用，自动绑定当前域名
+- **正式授权**：访问授权平台（aa.yywyrh.cn）购买授权码
+- **授权配置**：在后台「系统维护 → 授权管理」或 `.env` 中配置授权码
 
-- 首次访问后台自动进入 **30 天试用**，自动绑定当前域名
-- 试用满意后：前往授权平台（aa.yywyrh.cn）购买授权码，在后台「系统维护 → 授权管理」输入授权码，或在 `.env` 配置：
-  ```ini
-  AA_VERIFY_URL = https://aa.yywyrh.cn/api/v1/verify
-  AA_PROJECT_CODE = SC_ADMIN
-  AA_LICENSE_KEY = SC_ADMIN-XXXXXXXX
-  ```
-- **授权码与首次绑定的域名一一对应**，更换域名需重新购买
-- 试用到期未授权将限制登录，输入有效授权码即恢复
+---
 
-## 五、常见问题
+## 常见问题
 
-| 现象 | 原因与解决 |
-|---|---|
-| 安装向导提示扩展未开启 | 按第二节清单在宝塔开启对应扩展后刷新 |
-| 提示目录不可写 | `chmod -R 777 config runtime public storage database` |
-| 安装后页面空白/500 | beast 未生效：确认 PHP 为 8.1、`php -m | grep beast` 有输出、已重启 PHP-FPM |
-| 除首页外全 404 | Nginx 未配置伪静态（见第五节） |
-| 验证码不显示 | Redis 扩展/密码配置错误，检查 `.env` 的 REDIS_PASSWORD |
-| 授权验证失败 | 确认服务器可访问外网（curl 扩展已开），检查授权码与域名 |
+| 问题现象 | 解决方案 |
+|---------|---------|
+| 页面空白/500 错误 | 检查 beast 扩展是否生效，确认 PHP 8.1，重启 PHP-FPM |
+| 扩展检测不通过 | 在 php.ini 中启用所需扩展并重启 PHP-FPM |
+| 目录无写权限 | 执行 `chmod -R 777 config runtime public storage database` |
+| 除首页外 404 | 检查 Nginx 伪静态配置 |
+| 验证码不显示 | 检查 Redis 连接配置与密码设置 |
+| 授权验证失败 | 确认服务器可访问外网，检查授权码与域名绑定 |
 
-## 六、目录结构
+---
 
-```
-├── app/            # 应用代码（PHP，beast 加密，不可改明文）
-├── config/         # 配置（安装向导生成 install.lock）
-├── database/       # database.sql 与增量迁移
-├── public/         # Web 根目录（nginx root 指向此）
-├── resources/      # 视图/模板
-├── route/          # 路由
-├── vendor/         # 依赖（已内置，无需 composer install）
-├── beast.so        # beast 扩展（PHP 8.1）
-├── install.sh      # 一键安装 beast 扩展
-├── setup-nginx.sh  # nginx/beast/cron 初始化（可选）
-└── code_sync.php   # 授权平台远程驱动文件（勿删除）
-```
+## 更新日志
 
-> 源码已加密，交付内容不含明文业务密钥；`.env` 由安装向导生成随机密钥。详细部署说明见 `DEPLOY.txt`。
+每次版本更新会自动记录变更内容，可在后台「系统维护 → 版本更新」中查看。
+
+---
+
+## 技术支持
+
+如遇部署问题，请通过以下方式获取支持：
+- 查阅项目内的 `DEPLOY.txt` 部署文档
+- 联系技术支持团队
+
+---
+
+**SC Admin - 助力企业数字化转型**
