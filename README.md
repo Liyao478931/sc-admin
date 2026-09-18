@@ -25,13 +25,13 @@
 
 <div align="center">
 
-[在线体验](http://test-install.yywyrh.cn/admin/) | [移动端 H5](http://test-install.yywyrh.cn/h5/) | [提交反馈](https://gitee.com/li-yao11111/sc-admin/issues)
+[在线体验](http://demo.yywyrh.cn/admin/) | [移动端 H5](http://demo.yywyrh.cn/h5/) | [提交反馈](https://gitee.com/li-yao11111/sc-admin/issues)
 
 </div>
 
 <div align="center">
 
-🖥 **在线体验（含演示数据）**：后台 http://test-install.yywyrh.cn/admin/ ｜ 移动端 http://test-install.yywyrh.cn/h5/
+🖥 **在线体验（含演示数据）**：后台 http://demo.yywyrh.cn/admin/ ｜ 移动端 http://demo.yywyrh.cn/h5/
 👤 **演示账号（只读）**：demo ／ admin123　※ 仅可查看数据，无新增 / 编辑 / 删除等操作权限
 
 </div>
@@ -359,7 +359,7 @@ php schedule.php   # 自动写入 crontab（每分钟触发），内部按各任
 ### 📮 联系我们
 
 - **Gitee 仓库**：https://gitee.com/li-yao11111/sc-admin
-- **在线体验**：http://test-install.yywyrh.cn/admin/（只读演示账号 demo / admin123）｜ 移动端：http://test-install.yywyrh.cn/h5/
+- **在线体验**：http://demo.yywyrh.cn/admin/（只读演示账号 demo / admin123）｜ 移动端：http://demo.yywyrh.cn/h5/
 - **提交反馈 / 问题**：https://gitee.com/li-yao11111/sc-admin/issues
 
 如果本项目对你有帮助，欢迎右上角 Star ⭐ 支持一下！
