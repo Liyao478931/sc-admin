@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安装进度 - 数智管控平台 系统安装</title>
+<link rel="stylesheet" href="/install/css/installer.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="steps">
+      <div class="step done"><span class="dot">✓</span> 环境检测</div>
+      <div class="step-line"></div>
+      <div class="step done"><span class="dot">✓</span> 数据库</div>
+      <div class="step-line"></div>
+      <div class="step done"><span class="dot">✓</span> 管理员</div>
+      <div class="step-line"></div>
+      <div class="step active"><span class="dot">4</span> 安装</div>
+    </div>
+    <h1>正在安装</h1>
+    <div class="bar-wrap"><div class="bar" id="bar"></div></div>
+    <div class="bar-pct" id="pct">0%</div>
+    <div class="log" id="log"></div>
+    <div class="actions">
+      <button class="btn ghost" id="retryBtn" style="display:none" onclick="location.reload()">重新安装</button>
+    </div>
+  </div>
+  <div class="footer">© 2026 数智管控平台</div>
+</div>
+<script>
+var logEl = document.getElementById('log');
+var barEl = document.getElementById('bar');
+var pctEl = document.getElementById('pct');
+var retryBtn = document.getElementById('retryBtn');
+function appendLog(text, cls) {
+  var line = document.createElement('div');
+  line.className = cls || '';
+  line.textContent = text;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+function setPct(p) {
+  barEl.style.width = p + '%';
+  pctEl.textContent = p + '%';
+}
+function runStep(step) {
+  return fetch('/install/execute', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'step=' + step })
+    .then(function (r) { return r.json(); });
+}
+appendLog('开始执行安装...', 'info');
+var sequence = [2, 3, 4, 5, 6, 7]; // 跳过环境检测（step1 页面已通过），直接校验数据+安装
+(function next(i) {
+  if (i >= sequence.length) return;
+  runStep(sequence[i]).then(function (res) {
+    var icon = res.status === 'success' ? '✅' : '❌';
+    appendLog(icon + ' ' + (res.name || '步骤') + '：' + (res.msg || ''), res.status === 'success' ? 'ok' : 'fail');
+    setPct(res.progress || 0);
+    if (res.code !== 0) {
+      appendLog('❌ 安装失败，请修正后点击「重新安装」', 'fail');
+      retryBtn.style.display = 'inline-block';
+      return;
+    }
+    if (sequence[i] === 7) {
+      appendLog('🎉 安装完成！', 'ok');
+      setTimeout(function () { window.location.href = '/install/complete'; }, 1500);
+      return;
+    }
+    setTimeout(function () { next(i + 1); }, 500);
+  }).catch(function () {
+    appendLog('❌ 请求失败，请检查网络后重试', 'fail');
+    retryBtn.style.display = 'inline-block';
+  });
+})(0);
+</script>
+</body>
+</html>

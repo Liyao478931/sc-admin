@@ -1,0 +1,2 @@
+<?php
+ return [ 'code_length' => 6, 'code_expire' => 300, 'send_interval' => 60, 'max_attempts' => 5, 'lock_duration' => 1800, 'rate_limit_per_ip' => 10, 'rate_limit_per_phone' => 5, 'sms_provider' => 'log', 'template_id' => '', 'sign_name' => '', ]; 

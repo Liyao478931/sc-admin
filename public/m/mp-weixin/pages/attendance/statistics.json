@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "考勤统计",
+  "usingComponents": {
+    "u-icon": "../../node-modules/uview-plus/components/u-icon/u-icon",
+    "u-tag": "../../node-modules/uview-plus/components/u-tag/u-tag",
+    "u-empty": "../../node-modules/uview-plus/components/u-empty/u-empty"
+  }
+}

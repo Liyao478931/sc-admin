@@ -1,0 +1,21 @@
+/* 全局工具样式 */
+
+/* 通用间距 */
+.pd-sm { padding: $uni-spacing-row-sm; }
+.pd-base { padding: $uni-spacing-row-base; }
+.pd-lg { padding: $uni-spacing-row-lg; }
+.mt-sm { margin-top: $uni-spacing-row-sm; }
+.mt-base { margin-top: $uni-spacing-row-base; }
+.mt-lg { margin-top: $uni-spacing-row-lg; }
+
+/* 文字相关 */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-primary { color: $uni-color-primary; }
+.text-grey { color: $uni-text-color-grey; }
+.text-error { color: $uni-color-error; }
+
+.font-sm { font-size: $uni-font-size-sm; }
+.font-base { font-size: $uni-font-size-base; }
+.font-lg { font-size: $uni-font-size-lg; }
+.font-xl { font-size: $uni-font-size-xl; }

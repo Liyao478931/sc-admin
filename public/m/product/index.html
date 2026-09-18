@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>产品详情</title>
+<style>
+:root {
+  --brand: #409EFF;
+  --bg: #f2f4f8;
+  --card: #ffffff;
+  --radius: 14px;
+  --shadow: 0 4px 16px rgba(31,45,61,.06);
+  --text: #1f2d3d;
+  --sub: #909399;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { background:var(--bg); font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif; color:var(--text); font-size:14px; min-height:100vh; }
+.page { max-width:480px; margin:0 auto; padding:14px 14px 48px; }
+.card { background:var(--card); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:var(--shadow); }
+.prod-head { text-align:center; padding:6px 0 2px; }
+.dh-status { margin-bottom:10px; }
+.status-tag { display:inline-flex; align-items:center; padding:4px 13px; border-radius:999px; font-size:12px; font-weight:600; line-height:1; }
+.dh-name { font-size:21px; font-weight:700; margin-bottom:6px; }
+.dh-code { color:var(--sub); font-size:12px; }
+.section-title { display:flex; align-items:center; font-size:15px; font-weight:600; margin-bottom:12px; }
+.section-title::before { content:''; width:4px; height:14px; border-radius:2px; background:var(--brand); margin-right:8px; }
+.info-list { display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
+.info-item { display:flex; padding:7px 0; font-size:13px; border-bottom:1px solid #f5f7fa; }
+.info-item.full { grid-column:1 / -1; }
+.info-item .lb { color:var(--sub); width:74px; flex-shrink:0; }
+.info-item .val { color:var(--text); word-break:break-all; }
+.remark-text { font-size:13px; line-height:1.8; color:#4b5a6c; }
+.state-box { text-align:center; padding:90px 24px; color:var(--sub); }
+.spinner { width:34px;height:34px;border:3px solid #e3e8f0;border-top-color:var(--brand);border-radius:50%;margin:0 auto 16px;animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.state-emoji { font-size:44px; margin-bottom:12px; }
+.footer { text-align:center; color:#c0c4cc; font-size:12px; padding:22px 0 8px; line-height:1.7; }
+.btn { display:block; width:120px; margin:18px auto 0; padding:11px; border:none; border-radius:999px; background:var(--brand); color:#fff; font-size:14px; font-weight:600; text-align:center; cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div id="app">
+    <div id="state-loading" class="state-box"><div class="spinner"></div><div>加载中...</div></div>
+    <div id="state-error" class="state-box" style="display:none">
+      <div class="state-emoji">😕</div>
+      <div id="error-msg">产品不存在或加载失败</div>
+      <button class="btn" onclick="location.reload()">重试</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var API_BASE = window.location.origin;
+function getProductCode() {
+  var m = location.pathname.match(/\/m\/product\/([^\/?]+)/);
+  return m ? decodeURIComponent(m[1]) : (new URLSearchParams(location.search).get('code') || '');
+}
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+function kv(label, value, full) {
+  return '<div class="info-item' + (full ? ' full' : '') + '"><div class="lb">' + esc(label) + '</div><div class="val">' + esc(value || '-') + '</div></div>';
+}
+function render(p) {
+  var st = p.status === 1 ? { label: '启用', color: '#2f9e44', bg: 'rgba(47,158,68,.12)' } : { label: '停用', color: '#868e96', bg: 'rgba(134,142,150,.14)' };
+  var paramsHtml = (p.params && p.params.length)
+    ? '<div class="card"><div class="section-title">产品参数</div><div class="info-list">' +
+      p.params.map(function (x) { return kv(x.param_name, x.param_value + (x.param_unit ? ' ' + x.param_unit : '')); }).join('') +
+      '</div></div>'
+    : '';
+  var remarkHtml = p.remark ? '<div class="card"><div class="section-title">备注</div><div class="remark-text">' + esc(p.remark) + '</div></div>' : '';
+  var html =
+    '<div class="card"><div class="prod-head">' +
+      '<div class="dh-status"><span class="status-tag" style="background:' + st.bg + ';color:' + st.color + '">' + st.label + '</span></div>' +
+      '<div class="dh-name">' + esc(p.product_name) + '</div>' +
+      '<div class="dh-code">编码：' + esc(p.product_code) + '</div>' +
+    '</div></div>' +
+    '<div class="card"><div class="section-title">基本信息</div><div class="info-list">' +
+      kv('产品分类', p.category_name) + kv('规格型号', p.specification) + kv('单位', p.unit) + kv('排序', p.sort) +
+      kv('创建时间', p.create_time, true) +
+    '</div></div>' +
+    paramsHtml + remarkHtml +
+    '<div class="footer">华能装备 · 产品管理系统</div>';
+  document.getElementById('state-loading').style.display = 'none';
+  document.getElementById('state-error').style.display = 'none';
+  document.getElementById('app').innerHTML = html;
+}
+function showError(msg) {
+  document.getElementById('state-loading').style.display = 'none';
+  document.getElementById('state-error').style.display = 'block';
+  document.getElementById('error-msg').textContent = msg;
+}
+function load() {
+  var code = getProductCode();
+  if (!code) { showError('缺少产品编码'); return; }
+  fetch(API_BASE + '/api/business/product/public/detail?product_code=' + encodeURIComponent(code))
+    .then(function (r) { return r.json(); })
+    .then(function (r) {
+      if (r && r.code === 0 && r.data) render(r.data);
+      else showError(r && r.msg ? r.msg : '产品不存在');
+    })
+    .catch(function () { showError('网络异常，请稍后重试'); });
+}
+load();
+</script>
+</body>
+</html>

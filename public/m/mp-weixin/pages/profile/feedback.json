@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "意见反馈",
+  "usingComponents": {
+    "u-textarea": "../../node-modules/uview-plus/components/u-textarea/u-textarea",
+    "u-button": "../../node-modules/uview-plus/components/u-button/u-button"
+  }
+}

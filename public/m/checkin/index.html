@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>培训扫码签到</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f5f6fa; font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif; color:#303133; min-height:100vh; }
+.page { max-width:480px; margin:0 auto; padding:40px 24px; text-align:center; }
+.state-box { background:#fff; border-radius:16px; padding:40px 24px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+.spinner { width:36px;height:36px;border:3px solid #e3e8f0;border-top-color:#409EFF;border-radius:50%;margin:0 auto 16px;animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.icon { font-size:48px; margin-bottom:12px; display:block; }
+.title { font-size:20px; font-weight:700; margin-bottom:8px; }
+.msg { font-size:14px; color:#606266; line-height:1.7; }
+.msg.err { color:#F56C6C; }
+.msg.ok { color:#67C23A; }
+.detail { margin-top:16px; padding-top:16px; border-top:1px solid #f0f0f0; font-size:13px; color:#909399; text-align:left; line-height:1.9; }
+.btn { display:block; width:100%; padding:14px; border:none; border-radius:24px; background:#409EFF; color:#fff; font-size:16px; margin-top:20px; cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="state-box" id="box">
+    <div class="spinner"></div>
+    <div class="title">正在签到...</div>
+  </div>
+</div>
+
+<script>
+var API_BASE = window.location.origin;
+var params = new URLSearchParams(location.search);
+var recordId = params.get('record_id');
+var time = params.get('time');
+var sign = params.get('sign');
+
+function show(icon, title, msg, cls) {
+  document.getElementById('box').innerHTML =
+    '<span class="icon">' + icon + '</span>' +
+    '<div class="title">' + title + '</div>' +
+    '<div class="msg ' + (cls || '') + '">' + msg + '</div>';
+}
+
+function getToken() {
+  return localStorage.getItem('access_token') || localStorage.getItem('token') || '';
+}
+
+function setToken(t) {
+  localStorage.setItem('token', t);
+  localStorage.setItem('access_token', t);
+}
+
+/** 清理 URL 中的 wx/token/code 参数，仅保留 record_id/time/sign */
+function cleanUrl() {
+  var p = new URLSearchParams(location.search);
+  p.delete('wx'); p.delete('token'); p.delete('code'); p.delete('state');
+  var qs = p.toString();
+  return location.pathname + (qs ? '?' + qs : '');
+}
+
+/** WGS-84 转 GCJ-02（火星坐标），与后台签到地点坐标统一 */
+function wgs84ToGcj02(lng, lat) {
+  var PI = 3.1415926535897932384626;
+  var a = 6378245.0;
+  var ee = 0.00669342162296594323;
+  if (lng < 72.004 || lng > 137.8347 || lat < 0.8293 || lat > 55.8271) return { lng: lng, lat: lat };
+  function tLat(x, y) {
+    var r = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x));
+    r += (20.0 * Math.sin(6.0 * x * PI) + 20.0 * Math.sin(2.0 * x * PI)) * 2.0 / 3.0;
+    r += (20.0 * Math.sin(y * PI) + 40.0 * Math.sin(y / 3.0 * PI)) * 2.0 / 3.0;
+    r += (160.0 * Math.sin(y / 12.0 * PI) + 320 * Math.sin(y * PI / 30.0)) * 2.0 / 3.0;
+    return r;
+  }
+  function tLng(x, y) {
+    var r = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
+    r += (20.0 * Math.sin(6.0 * x * PI) + 20.0 * Math.sin(2.0 * x * PI)) * 2.0 / 3.0;
+    r += (20.0 * Math.sin(x * PI) + 40.0 * Math.sin(x / 3.0 * PI)) * 2.0 / 3.0;
+    r += (150.0 * Math.sin(x / 12.0 * PI) + 300.0 * Math.sin(x / 30.0 * PI)) * 2.0 / 3.0;
+    return r;
+  }
+  var dLat = tLat(lng - 105.0, lat - 35.0);
+  var dLng = tLng(lng - 105.0, lat - 35.0);
+  var radLat = lat / 180.0 * PI;
+  var magic = Math.sin(radLat);
+  magic = 1 - ee * magic * magic;
+  var sqrtMagic = Math.sqrt(magic);
+  dLat = (dLat * 180.0) / ((a * (1 - ee)) / (magic * sqrtMagic) * PI);
+  dLng = (dLng * 180.0) / (a / sqrtMagic * Math.cos(radLat) * PI);
+  return { lng: lng + dLng, lat: lat + dLat };
+}
+
+function getLocation() {
+  return new Promise(function (resolve, reject) {
+    if (!navigator.geolocation) { reject(new Error('该浏览器不支持定位')); return; }
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      var g = wgs84ToGcj02(pos.coords.longitude, pos.coords.latitude);
+      resolve({ lat: g.lat, lng: g.lng });
+    }, function () { reject(new Error('获取定位失败，请开启定位权限')); }, { enableHighAccuracy: true, timeout: 10000 });
+  });
+}
+
+function checkin() {
+  if (!recordId || !time || !sign) { show('❌', '二维码无效', '签到二维码参数不完整，请重新扫码', 'err'); return; }
+  var token = getToken();
+  if (!token) { show('🔑', '请先登录', '请先登录员工端后重新扫码签到', 'err'); return; }
+
+  getLocation().then(function (pos) {
+    var body = new URLSearchParams();
+    body.append('record_id', recordId);
+    body.append('lat', pos.lat);
+    body.append('lng', pos.lng);
+    body.append('address', '');
+    body.append('time', time);
+    body.append('sign', sign);
+
+    fetch(API_BASE + '/api/mobile/safety/training/checkin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + token },
+      body: body.toString()
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (res.code === 0) {
+        show('✅', '签到成功', res.msg || '签到成功', 'ok');
+      } else {
+        show('❌', '签到失败', res.msg || '签到失败', 'err');
+      }
+    }).catch(function () { show('❌', '网络异常', '请检查网络后重试', 'err'); });
+  }).catch(function (err) {
+    show('📍', '定位失败', (err && err.message) || '未获取到定位，请开启定位权限后重试', 'err');
+  });
+}
+
+function init() {
+  // 微信 OAuth 回调：识别员工成功 → 存储 token → 自动签到
+  var wxToken = params.get('token');
+  if (params.get('wx') === 'ok' && wxToken) {
+    setToken(wxToken);
+    history.replaceState(null, '', cleanUrl());
+    checkin();
+    return;
+  }
+  // 微信未绑定员工
+  if (params.get('wx') === 'noauth') {
+    show('🔒', '未绑定微信', '该微信未绑定员工，请联系管理员绑定后签到', 'err');
+    return;
+  }
+  // 微信内置浏览器内未登录 → 微信静默授权自动识别员工
+  if (/MicroMessenger/i.test(navigator.userAgent) && !getToken()) {
+    show('', '正在识别身份...', '正在通过微信自动识别员工身份');
+    var redirect = cleanUrl();
+    fetch(API_BASE + '/api/checkin/wechat-auth-url?redirect=' + encodeURIComponent(redirect))
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (res.code === 0 && res.data && res.data.url) { location.href = res.data.url; }
+        else show('🔑', '请先登录', '请先登录员工端后重新扫码签到', 'err');
+      })
+      .catch(function () { show('🔑', '请先登录', '请先登录员工端后重新扫码签到', 'err'); });
+    return;
+  }
+  checkin();
+}
+init();
+</script>
+</body>
+</html>

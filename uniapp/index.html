@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover" />
+    <title>数智管控平台员工端</title>
+    <link rel="icon" href="/static/images/favicon.ico" />
+<script>
+// ===== 启动页前置逻辑 v4（预置 hash，零阻塞，不闪登录页）=====
+(function () {
+  function getHashPath() { return (location.hash || '#/').replace(/^#/, '').split('?')[0]; }
+  if (getHashPath().indexOf('/pages/splash/index') === 0) return;
+  if (sessionStorage.getItem('sc_splash_shown')) return;
+  sessionStorage.setItem('sc_splash_shown', '1');
+  location.hash = '#/pages/splash/index';
+})();
+
+// ===== 启动页旋转圆环动画 keyframes =====
+if (!document.getElementById('sc-splash-spin-css')) {
+  var st = document.createElement('style');
+  st.id = 'sc-splash-spin-css';
+  st.textContent = '@keyframes scSplashSpin { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }';
+  document.head.appendChild(st);
+}
+// ===== 隐藏启动页跳过按钮与倒计时 =====
+if (!document.getElementById('sc-splash-hide-css')) {
+  var st2 = document.createElement('style');
+  st2.id = 'sc-splash-hide-css';
+  st2.textContent = '.splash .skip-btn, .splash .timer { display: none !important; }';
+  document.head.appendChild(st2);
+}
+
+// ===== 启动页旋转圆环注入 v4（强制覆盖：任何旧环一律换成 ring_v8）=====
+(function () {
+  if (window.__scRingInjected) return;
+  window.__scRingInjected = true;
+  var host = window.location.origin;
+  var SRC = host + '/uploads/splash/image/ring_v8.png?v=1';
+  var CSS = 'position:fixed;top:36%;left:50%;transform:translate(-50%,-50%);width:48vw;height:48vw;max-width:340px;max-height:340px;z-index:5;pointer-events:none;opacity:1;animation:scSplashSpin 6s linear infinite;will-change:transform;';
+  function apply() {
+    try {
+      var s = document.querySelector('.splash');
+      if (!s) return false;
+      var r = s.querySelector('img[src*="ring_"]');
+      if (r) {
+        if (r.src.indexOf('ring_v8.png') === -1) { r.src = SRC; }
+        r.style.cssText = CSS;
+        return true;
+      }
+      r = document.createElement('img');
+      r.src = SRC;
+      r.style.cssText = CSS;
+      s.appendChild(r);
+      return true;
+    } catch (e) { return false; }
+  }
+  apply();
+  var tries = 0;
+  var iv = setInterval(function () {
+    if (apply() || ++tries > 60) { clearInterval(iv); }
+  }, 200);
+  window.addEventListener('hashchange', function () {
+    setTimeout(function () { apply(); }, 400);
+  });
+})();
+</script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

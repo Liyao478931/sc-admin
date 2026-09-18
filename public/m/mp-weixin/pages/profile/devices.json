@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "登录设备管理",
+  "usingComponents": {
+    "u-loading-icon": "../../node-modules/uview-plus/components/u-loading-icon/u-loading-icon",
+    "m-icon": "../../components/MIcon"
+  }
+}

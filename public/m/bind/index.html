@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>安全密钥绑定</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif; background: linear-gradient(160deg, #0f2027, #203a43, #2c5364); min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .wrap { width: 88%; max-width: 400px; text-align: center; padding: 32px 20px; background: rgba(255,255,255,0.08); border-radius: 16px; backdrop-filter: blur(6px); }
+  .icon { font-size: 56px; margin-bottom: 12px; }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+  .sub { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.6; }
+  .status { margin-top: 22px; font-size: 15px; line-height: 1.6; min-height: 24px; color: #ffe28a; word-break: break-all; }
+  .wrap.success .status { color: #7CFC9B; }
+  .wrap.fail .status { color: #FF8A8A; }
+  .tip { margin-top: 18px; font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="icon">🔐</div>
+  <h1>安全密钥绑定</h1>
+  <p class="sub">请在手机上完成指纹 / 人脸 / PIN 验证，<br>绑定后即可用本机安全密钥登录</p>
+  <div class="status" id="status">准备中…</div>
+  <p class="tip">绑定成功后请返回电脑端确认结果</p>
+</div>
+<script>
+(function () {
+  var qs = new URLSearchParams(location.search)
+  var token = qs.get('token') || ''
+  var $s = document.getElementById('status')
+  var $w = document.getElementById('wrap')
+
+  function b64urlToBuf (b64) {
+    var s = String(b64)
+    var m = s.match(/^=\?[^?]*\?B\?([^?]*)\?=$/)
+    if (m) s = m[1]
+    var base64 = s.replace(/-/g, '+').replace(/_/g, '/')
+    while (base64.length % 4) base64 += '='
+    var bin = atob(base64)
+    var buf = new Uint8Array(bin.length)
+    for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i)
+    return buf.buffer
+  }
+  function bufToB64url (buf) {
+    var bytes = new Uint8Array(buf)
+    var bin = ''
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i])
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+  }
+  function setStatus (txt, ok) {
+    $s.textContent = txt
+    if (ok === true) $w.className = 'wrap success'
+    else if (ok === false) $w.className = 'wrap fail'
+  }
+  function errText (err) {
+    var name = err && err.name
+    if (name === 'NotAllowedError') return '验证取消或超时，请重试'
+    if (name === 'NotSupportedError') return '当前浏览器不支持，请用系统浏览器扫码'
+    if (name === 'InvalidStateError') return '该设备已绑定过，无需重复绑定'
+    return (err && err.message) ? '绑定失败：' + err.message : '绑定失败：未知错误'
+  }
+
+  async function main () {
+    if (!token) { setStatus('缺少绑定凭证，请重新扫码', false); return }
+    if (!window.PublicKeyCredential) { setStatus('当前浏览器不支持 WebAuthn，请使用系统浏览器', false); return }
+    try {
+      setStatus('正在获取绑定信息…')
+      var optRes = await fetch('/api/webauthn/qrcode/register/options', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ auth_token: token })
+      })
+      var optData = await optRes.json()
+      if (!optData || optData.code !== 0) { setStatus((optData && optData.msg) || '获取绑定信息失败', false); return }
+      var args = optData.data.options
+      var a = args.publicKey || args
+      var pk = {
+        challenge: b64urlToBuf(a.challenge),
+        rp: { id: a.rp.id, name: a.rp.name || a.rp.id },
+        user: { id: b64urlToBuf(a.user.id), name: a.user.name, displayName: a.user.displayName || a.user.name },
+        pubKeyCredParams: a.pubKeyCredParams,
+        timeout: a.timeout || 60000,
+        attestation: 'none',
+        authenticatorSelection: a.authenticatorSelection || { userVerification: 'required' }
+      }
+      if (a.excludeCredentials && a.excludeCredentials.length) {
+        pk.excludeCredentials = a.excludeCredentials.map(function (c) {
+          return { id: b64urlToBuf(c.id), type: c.type || 'public-key', transports: c.transports || ['usb'] }
+        })
+      }
+      setStatus('请在手机上完成指纹 / 人脸 / PIN 验证')
+      var cred = await navigator.credentials.create({ publicKey: pk })
+      setStatus('正在提交绑定…')
+      var payload = {
+        auth_token: token,
+        client_data_json: bufToB64url(cred.response.clientDataJSON),
+        attestation_object: bufToB64url(cred.response.attestationObject),
+        device_name: '鸿蒙手机',
+        transports: cred.response.getTransports ? cred.response.getTransports().join(',') : 'usb'
+      }
+      var comRes = await fetch('/api/webauthn/qrcode/register/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      var comData = await comRes.json()
+      if (comData && comData.code === 0) {
+        setStatus('✅ 绑定成功，请返回电脑端确认', true)
+      } else {
+        setStatus('❌ ' + ((comData && comData.msg) || '绑定失败'), false)
+      }
+    } catch (err) {
+      setStatus(errText(err), false)
+    }
+  }
+
+  main()
+})()
+</script>
+</body>
+</html>

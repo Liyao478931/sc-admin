@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "快速考核",
+  "usingComponents": {
+    "u-input": "../../node-modules/uview-plus/components/u-input/u-input",
+    "u-icon": "../../node-modules/uview-plus/components/u-icon/u-icon",
+    "u-empty": "../../node-modules/uview-plus/components/u-empty/u-empty",
+    "u-button": "../../node-modules/uview-plus/components/u-button/u-button",
+    "u-textarea": "../../node-modules/uview-plus/components/u-textarea/u-textarea",
+    "u-switch": "../../node-modules/uview-plus/components/u-switch/u-switch"
+  }
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>库存补货建议 - SC数智管控平台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#f0f2f5;color:#1f2d3d;min-height:100vh}
+.topbar{background:#1f2d3d;color:#fff;padding:14px 24px;display:flex;justify-content:space-between;align-items:center}
+.topbar h1{font-size:18px;font-weight:600}
+.topbar .user{font-size:13px;opacity:.85}
+.wrap{max-width:1280px;margin:0 auto;padding:20px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card .num{font-size:30px;font-weight:700;color:#2b6de8;margin-top:6px}
+.card .label{color:#8a94a6;font-size:13px}
+.card.orange .num{color:#e8962b}.card.green .num{color:#21a563}.card.red .num{color:#e5484d}
+.toolbar{display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
+.btn{background:#2b6de8;color:#fff;border:0;padding:9px 18px;border-radius:6px;font-size:14px;cursor:pointer}
+.btn:hover{opacity:.9}
+.btn.ghost{background:#fff;color:#2b6de8;border:1px solid #2b6de8}
+.btn.sm{padding:5px 12px;font-size:13px}
+.btn.green{background:#21a563}.btn.gray{background:#8a94a6}
+select,input{border:1px solid #d9dee7;border-radius:6px;padding:8px 12px;font-size:14px;background:#fff}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid #eef1f6;font-size:14px}
+th{background:#f7f9fc;color:#5a6b85;font-weight:600}
+tr:hover td{background:#f8faff}
+.tag{padding:2px 10px;border-radius:12px;font-size:12px}
+.tag.pending{background:#fff3e0;color:#e8962b}
+.tag.confirmed{background:#e6f7ee;color:#21a563}
+.tag.ignored{background:#f0f2f5;color:#8a94a6}
+.empty{text-align:center;color:#8a94a6;padding:40px}
+.pager{display:flex;justify-content:space-between;align-items:center;margin-top:14px;color:#8a94a6;font-size:13px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1f2d3d;color:#fff;padding:10px 22px;border-radius:8px;font-size:14px;opacity:0;transition:.3s;z-index:99}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="topbar"><h1>库存补货建议</h1><span class="user" id="userInfo">SC数智管控平台</span></div>
+<div class="wrap">
+  <div class="cards">
+    <div class="card"><div class="label">待处理建议</div><div class="num" id="cPending">-</div></div>
+    <div class="card orange"><div class="label">建议补货总量</div><div class="num" id="cQty">-</div></div>
+    <div class="card red"><div class="label">短缺物料</div><div class="num" id="cShortage">-</div></div>
+    <div class="card green"><div class="label">已确认</div><div class="num" id="cConfirmed">-</div></div>
+  </div>
+  <div class="toolbar">
+    <button class="btn" onclick="gen()">一键生成补货建议</button>
+    <select id="fStatus" onchange="load(1)">
+      <option value="">全部状态</option>
+      <option value="0">待处理</option>
+      <option value="1">已确认</option>
+      <option value="2">已忽略</option>
+    </select>
+    <input id="fKw" placeholder="物料名称/编码/单号" onkeydown="if(event.key==='Enter')load(1)">
+    <button class="btn ghost" onclick="load(1)">查询</button>
+  </div>
+  <table>
+    <thead><tr><th>建议单号</th><th>物料编码</th><th>物料名称</th><th>规格</th><th>当前库存</th><th>安全库存</th><th>建议补货</th><th>原因</th><th>供应商</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div class="pager"><span id="pageInfo"></span><span><button class="btn ghost sm" onclick="load(cur-1)" id="prevB">上一页</button> <button class="btn ghost sm" onclick="load(cur+1)" id="nextB">下一页</button></span></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var token = localStorage.getItem('sc_admin_token') || '';
+var cur = 1, LIMIT = 15;
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)}
+function api(url, opt){
+  var h = {'Content-Type':'application/json'};
+  if(token) h['Authorization'] = 'Bearer ' + token;
+  opt = opt || {}; opt.headers = h;
+  return fetch('/api/' + url, opt).then(function(r){return r.json()}).catch(function(e){return {code:1,msg:String(e)}});
+}
+function fmt(n){ n = Number(n)||0; return n.toLocaleString(); }
+function load(p){
+  if(p<1) return; cur = p;
+  var st = document.getElementById('fStatus').value;
+  var kw = document.getElementById('fKw').value.trim();
+  api('stock-replenish/list?page='+cur+'&limit='+LIMIT+'&status='+st+'&keyword='+encodeURIComponent(kw)).then(function(j){
+    if(j.code!==0){toast(j.msg||'加载失败');return}
+    var d=j.data, tb=document.getElementById('tbody');
+    document.getElementById('pageInfo').textContent='共 '+d.total+' 条，第 '+d.page+'/'+Math.max(1,Math.ceil(d.total/d.limit))+' 页';
+    document.getElementById('prevB').style.visibility = d.page>1?'visible':'hidden';
+    document.getElementById('nextB').style.visibility = d.page<Math.ceil(d.total/d.limit)?'visible':'hidden';
+    if(!d.list.length){tb.innerHTML='<tr><td colspan="11" class="empty">暂无数据</td></tr>';return}
+    tb.innerHTML = d.list.map(function(r){
+      var tag = r.status===0?'pending':(r.status===1?'confirmed':'ignored');
+      var act = r.status===0
+        ? '<button class="btn green sm" onclick="confirm('+r.id+')">确认</button> <button class="btn gray sm" onclick="ignore('+r.id+')">忽略</button>'
+        : (r.status===1?'<span style="color:#21a563;font-size:13px">'+ (r.confirm_user_name||'') +'</span>':'<span style="color:#8a94a6;font-size:13px">已忽略</span>');
+      return '<tr><td>'+r.suggest_no+'</td><td>'+r.material_code+'</td><td>'+r.material_name+'</td><td>'+r.spec+'</td><td>'+fmt(r.current_stock)+'</td><td>'+fmt(r.safety_stock)+'</td><td><b>'+fmt(r.suggest_qty)+'</b> '+(r.unit||'')+'</td><td>'+r.reason_text+'</td><td>'+(r.supplier_name||'-')+'</td><td><span class="tag '+tag+'">'+r.status_text+'</span></td><td>'+act+'</td></tr>';
+    }).join('');
+  });
+}
+function summary(){
+  api('stock-replenish/summary').then(function(j){
+    if(j.code!==0)return;
+    document.getElementById('cPending').textContent=j.data.pending;
+    document.getElementById('cQty').textContent=fmt(j.data.total_qty);
+    document.getElementById('cShortage').textContent=j.data.shortage;
+    document.getElementById('cConfirmed').textContent=j.data.confirmed;
+  });
+}
+function gen(){
+  if(!confirm('将扫描所有库存为0或低于安全库存的物料生成补货建议，继续？'))return;
+  api('stock-replenish/generate',{method:'POST'}).then(function(j){
+    toast(j.msg||(j.code===0?'成功':'失败')); summary(); load(cur);
+  });
+}
+function confirm(id){ if(!confirm('确认该补货建议并跟进采购？'))return; api('stock-replenish/confirm',{method:'POST',body:JSON.stringify({id:id})}).then(function(j){toast(j.msg);summary();load(cur)}); }
+function ignore(id){ if(!confirm('忽略该补货建议？'))return; api('stock-replenish/dismiss',{method:'POST',body:JSON.stringify({id:id,remark:'手动忽略'})}).then(function(j){toast(j.msg);summary();load(cur)}); }
+var u = JSON.parse(localStorage.getItem('sc_admin_user')||'{}');
+document.getElementById('userInfo').textContent = (u.real_name||u.username||'') + ' · 库存补货建议';
+summary(); load(1);
+</script>
+</body>
+</html>

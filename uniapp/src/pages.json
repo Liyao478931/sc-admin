@@ -1,0 +1,504 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^u--(.*)": "uview-plus/components/u-$1/u-$1.vue",
+      "^up-(.*)": "uview-plus/components/u-$1/u-$1.vue",
+      "^u-([^-].*)": "uview-plus/components/u-$1/u-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/login/index",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/splash/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/agreement/index",
+      "style": {
+        "navigationBarTitleText": "用户协议",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/diy/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/workbench/index",
+      "style": {}
+    },
+    {
+      "path": "pages/contacts/index",
+      "style": {}
+    },
+    {
+      "path": "pages/messages/index",
+      "style": {
+        "navigationBarTitleText": "消息"
+      }
+    },
+    {
+      "path": "pages/message/index",
+      "style": {
+        "navigationBarTitleText": "消息",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/oa/index",
+      "style": {
+        "navigationBarTitleText": "OA审批",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/oa/apply",
+      "style": {
+        "navigationBarTitleText": "请假申请",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/oa/expense",
+      "style": {
+        "navigationBarTitleText": "费用报销",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/messages/search",
+      "style": {
+        "navigationBarTitleText": "消息搜索"
+      }
+    },
+    {
+      "path": "pages/messages/detail",
+      "style": {
+        "navigationBarTitleText": "消息详情"
+      }
+    },
+    {
+      "path": "pages/contacts/detail",
+      "style": {
+        "navigationBarTitleText": "员工详情"
+      }
+    },
+    {
+      "path": "pages/contacts/chat",
+      "style": {
+        "navigationBarTitleText": "聊天"
+      }
+    },
+    {
+      "path": "pages/more/index",
+      "style": {
+        "navigationBarTitleText": "更多功能"
+      }
+    },
+    {
+      "path": "pages/search/index",
+      "style": {
+        "navigationBarTitleText": "搜索"
+      }
+    },
+    {
+      "path": "pages/report/index",
+      "style": {
+        "navigationBarTitleText": "报工"
+      }
+    },
+    {
+      "path": "pages/report/detail",
+      "style": {
+        "navigationBarTitleText": "报工详情"
+      }
+    },
+    {
+      "path": "pages/my/reports/index",
+      "style": {
+        "navigationBarTitleText": "我的报工",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/my/salary/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/approval/todo",
+      "style": {
+        "navigationBarTitleText": "我的待办",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/approval/history",
+      "style": {
+        "navigationBarTitleText": "审批历史",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/attendance/index",
+      "style": {
+        "navigationBarTitleText": "考勤打卡",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/attendance/statistics",
+      "style": {
+        "navigationBarTitleText": "考勤统计"
+      }
+    },
+    {
+      "path": "pages/attendance/settings",
+      "style": {
+        "navigationBarTitleText": "打卡设置"
+      }
+    },
+    {
+      "path": "pages/attendance/records/calendar",
+      "style": {
+        "navigationBarTitleText": "考勤统计"
+      }
+    },
+    {
+      "path": "pages/attendance/face-capture",
+      "style": {
+        "navigationBarTitleText": "人脸采集",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/order/detail",
+      "style": {
+        "navigationBarTitleText": "工单详情",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {}
+    },
+    {
+      "path": "pages/profile/archive",
+      "style": {
+        "navigationBarTitleText": "个人档案"
+      }
+    },
+    {
+      "path": "pages/profile/settings",
+      "style": {
+        "navigationBarTitleText": "更多设置"
+      }
+    },
+    {
+      "path": "pages/profile/devices",
+      "style": {
+        "navigationBarTitleText": "登录设备管理"
+      }
+    },
+    {
+      "path": "pages/profile/password",
+      "style": {
+        "navigationBarTitleText": "修改密码"
+      }
+    },
+    {
+      "path": "pages/profile/wechat",
+      "style": {
+        "navigationBarTitleText": "微信绑定"
+      }
+    },
+    {
+      "path": "pages/profile/about",
+      "style": {
+        "navigationBarTitleText": "关于系统",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/profile/help",
+      "style": {
+        "navigationBarTitleText": "使用帮助"
+      }
+    },
+    {
+      "path": "pages/profile/feedback",
+      "style": {
+        "navigationBarTitleText": "意见反馈"
+      }
+    },
+    {
+      "path": "pages/profile/edit",
+      "style": {
+        "navigationBarTitleText": "编辑资料"
+      }
+    },
+    {
+      "path": "pages/sub/inspection/task-list",
+      "style": {
+        "navigationBarTitleText": "设备巡检"
+      }
+    },
+    {
+      "path": "pages/sub/inspection/execute",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/inspection/record-list",
+      "style": {
+        "navigationBarTitleText": "巡检记录"
+      }
+    },
+    {
+      "path": "pages/sub/inspection/record-detail",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/cockpit/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/sub/maintenance/task-list",
+      "style": {
+        "navigationBarTitleText": "保养任务"
+      }
+    },
+    {
+      "path": "pages/sub/maintenance/notification-list",
+      "style": {
+        "navigationBarTitleText": "保养通知"
+      }
+    },
+    {
+      "path": "pages/sub/maintenance/execute",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/maintenance/record-detail",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/task-list",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/execute",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/record-detail",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/certificate-detail",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/accident-detail",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/training-detail",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/exam-result",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/accident-list",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/my-training",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/my-certificates",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/exam-detail",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/exam-do",
+      "style": {
+        "navigationBarTitleText": "在线考试"
+      }
+    },
+    {
+      "path": "pages/sub/safety/exam-verify",
+      "style": {
+        "navigationBarTitleText": "实名验证"
+      }
+    },
+    {
+      "path": "pages/sub/safety/accident-report",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/courseware-preview",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/my-exams",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/safety/certificate-webview",
+      "style": {
+        "navigationBarTitleText": "培训证书"
+      }
+    },
+    {
+      "path": "pages/sub/repair/task-list",
+      "style": {
+        "navigationBarTitleText": "维修任务"
+      }
+    },
+    {
+      "path": "pages/sub/repair/execute",
+      "style": {}
+    },
+    {
+      "path": "pages/sub/repair/record-detail",
+      "style": {}
+    },
+    {
+      "path": "pages/asset/my-list",
+      "style": {
+        "navigationBarTitleText": "我的资产",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/asset/detail",
+      "style": {
+        "navigationBarTitleText": "资产详情"
+      }
+    },
+    {
+      "path": "pages/asset/transfer",
+      "style": {
+        "navigationBarTitleText": "资产调拨"
+      }
+    },
+    {
+      "path": "pages/asset/return",
+      "style": {
+        "navigationBarTitleText": "退还申请"
+      }
+    },
+    {
+      "path": "pages/asset/apply",
+      "style": {
+        "navigationBarTitleText": "领用申请"
+      }
+    },
+    {
+      "path": "pages/sub/webview/index",
+      "style": {
+        "navigationBarTitleText": "详情"
+      }
+    },
+    {
+      "path": "pages/assessment/index",
+      "style": {
+        "navigationBarTitleText": "考核管理"
+      }
+    },
+    {
+      "path": "pages/assessment/quick-deduct",
+      "style": {
+        "navigationBarTitleText": "快速考核"
+      }
+    },
+    {
+      "path": "pages/assessment/team-dashboard",
+      "style": {
+        "navigationBarTitleText": "团队考核看板"
+      }
+    },
+    {
+      "path": "pages/assessment/employee-detail",
+      "style": {
+        "navigationBarTitleText": "员工考核详情"
+      }
+    },
+    {
+      "path": "pages/assessment/todo-list",
+      "style": {
+        "navigationBarTitleText": "待办审批"
+      }
+    },
+    {
+      "path": "pages/profile/bind-phone",
+      "style": {
+        "navigationBarTitleText": "绑定手机号"
+      }
+    },
+    {
+      "path": "pages/assessment/my-assessment",
+      "style": {
+        "navigationBarTitleText": "我的考核"
+      }
+    },
+    {
+      "path": "pages/assessment/deduction-detail",
+      "style": {
+        "navigationBarTitleText": "扣分明细"
+      }
+    },
+    {
+      "path": "pages/assessment/appeal-submit",
+      "style": {
+        "navigationBarTitleText": "发起申诉"
+      }
+    },
+    {
+      "path": "pages/assessment/my-appeals",
+      "style": {
+        "navigationBarTitleText": "我的申诉"
+      }
+    },
+    {
+      "path": "pages/announcement/index",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "公告中心"
+      }
+    },
+    {
+      "path": "pages/announcement/detail",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "公告详情"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F8F8F8"
+  }
+}

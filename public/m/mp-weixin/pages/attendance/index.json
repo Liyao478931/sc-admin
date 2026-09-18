@@ -1,0 +1,15 @@
+{
+  "navigationBarTitleText": "考勤打卡",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "u-avatar": "../../node-modules/uview-plus/components/u-avatar/u-avatar",
+    "u-navbar": "../../node-modules/uview-plus/components/u-navbar/u-navbar",
+    "u-loading-icon": "../../node-modules/uview-plus/components/u-loading-icon/u-loading-icon",
+    "u-icon": "../../node-modules/uview-plus/components/u-icon/u-icon",
+    "u-tag": "../../node-modules/uview-plus/components/u-tag/u-tag",
+    "u-overlay": "../../node-modules/uview-plus/components/u-overlay/u-overlay",
+    "u-button": "../../node-modules/uview-plus/components/u-button/u-button",
+    "u-popup": "../../node-modules/uview-plus/components/u-popup/u-popup",
+    "u-input": "../../node-modules/uview-plus/components/u-input/u-input"
+  }
+}

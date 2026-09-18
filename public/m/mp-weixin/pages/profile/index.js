@@ -1,0 +1,1 @@
+"use strict";const e=require("../../common/vendor.js"),r=require("../../utils/navigate.js"),s=require("../../constants/pages.js"),t={__name:"index",setup:t=>(e.onLoad(()=>{r.redirectTo(s.DIY_PATHS.PROFILE,{from:"legacy"})}),(e,r)=>({}))},a=e._export_sfc(t,[["__scopeId","data-v-e317cbe1"]]);wx.createPage(a);

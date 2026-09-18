@@ -1,0 +1,72 @@
+{
+  "name": "数智管控平台员工端",
+  "appid": "",
+  "description": "uni-app Vue3 项目",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "app-plus": {
+    "usingComponents": true,
+    "nvueStyleCompiler": "uni-app",
+    "compilerVersion": 3,
+    "splashscreen": {
+      "alwaysShowBeforeRender": true,
+      "waiting": true,
+      "autoclose": true,
+      "delay": 0
+    },
+    "modules": {},
+    "distribute": {
+      "android": {
+        "permissions": [
+          "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>"
+        ]
+      },
+      "ios": {},
+      "sdkConfigs": {
+        "maps": {
+          "tencent": {
+            "key": "Z3DBZ-YIKCZ-JZNXJ-ZEUI6-LZACV-ZXBMR"
+          }
+        }
+      }
+    }
+  },
+  "quickapp": {},
+  "mp-weixin": {
+    "appid": "wx67c22a5672e3852a",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "postcss": true,
+      "minified": true
+    },
+    "usingComponents": true,
+    "requiredPrivateInfos": ["getLocation"],
+    "permission": {
+      "scope.userLocation": {
+        "desc": "用于考勤打卡位置校验"
+      },
+      "scope.camera": {
+        "desc": "用于考勤打卡人脸识别验证"
+      }
+    }
+  },
+  "h5": {
+    "title": "数智管控平台员工端",
+    "router": {
+      "mode": "hash",
+      "base": "/h5/"
+    },
+    "sdkConfigs": {
+      "maps": {
+        "tencent": {
+          "key": "Z3DBZ-YIKCZ-JZNXJ-ZEUI6-LZACV-ZXBMR"
+        }
+      }
+    }
+  },
+  "vueVersion": "3"
+}

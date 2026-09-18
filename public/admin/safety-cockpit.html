@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>安全驾驶舱 · SC数智管控平台</title>
+<style>
+:root{
+  --bg1:#04070f; --bg2:#071527;
+  --panel:rgba(9,24,45,.62); --panel-br:rgba(0,190,255,.22);
+  --cyan:#00d4ff; --blue:#3aa0ff; --teal:#22d3ee;
+  --green:#34d399; --amber:#fbbf24; --red:#f87171;
+  --txt:#e8f4ff; --dim:#7fa6c9; --dim2:#4d7397;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden}
+body{
+  font-family:"Microsoft YaHei","PingFang SC",-apple-system,BlinkMacSystemFont,sans-serif;
+  background:
+    radial-gradient(1200px 700px at 15% -10%, rgba(0,120,255,.16), transparent 60%),
+    radial-gradient(1000px 600px at 110% 110%, rgba(0,212,255,.10), transparent 55%),
+    linear-gradient(160deg,var(--bg1),var(--bg2) 55%,#040a14);
+  color:var(--txt);
+  position:relative;
+}
+/* 网格底纹 */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;
+  background-image:
+    linear-gradient(rgba(0,190,255,.12) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,190,255,.12) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+}
+/* 顶部 */
+.header{
+  position:relative;height:64px;display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid rgba(0,190,255,.28);
+  background:linear-gradient(90deg,transparent,rgba(0,120,255,.12),transparent);
+}
+.header h1{
+  font-size:26px;font-weight:700;letter-spacing:6px;color:#fff;
+  text-shadow:0 0 18px rgba(0,212,255,.55);
+}
+.header h1 small{font-size:13px;color:var(--dim);letter-spacing:2px;margin-left:10px;font-weight:400}
+.header .l, .header .r{
+  position:absolute;top:0;height:100%;display:flex;align-items:center;gap:8px;color:var(--dim);font-size:13px;
+}
+.header .l{left:22px} .header .r{right:22px}
+.header .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
+.fs-btn{
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  background:rgba(0,190,255,.08);border:1px solid rgba(0,190,255,.35);color:var(--cyan);
+  font-size:12px;letter-spacing:1px;padding:6px 12px;border-radius:6px;
+  transition:all .25s;font-family:inherit;line-height:1;
+}
+.fs-btn:hover{background:rgba(0,190,255,.2);box-shadow:0 0 14px rgba(0,212,255,.35)}
+.fs-btn:active{transform:scale(.96)}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+#clock{font-size:15px;color:#cfe9ff;font-variant-numeric:tabular-nums;letter-spacing:1px}
+
+/* 主体布局 */
+.main{
+  display:grid;grid-template-columns:290px 1fr 300px;grid-template-rows:1fr;
+  gap:12px;padding:12px;height:calc(100% - 64px);
+}
+.col{display:flex;flex-direction:column;gap:12px;min-height:0}
+.center{display:grid;grid-template-rows:1fr 1fr;gap:12px;min-height:0}
+
+.panel{
+  position:relative;background:var(--panel);border:1px solid var(--panel-br);
+  border-radius:10px;padding:12px 14px;backdrop-filter:blur(4px);
+  box-shadow:inset 0 0 22px rgba(0,120,255,.05), 0 4px 22px rgba(0,0,0,.35);
+}
+.panel::before,.panel::after{
+  content:"";position:absolute;width:14px;height:14px;pointer-events:none;
+}
+.panel::before{top:-1px;left:-1px;border-top:2px solid var(--cyan);border-left:2px solid var(--cyan)}
+.panel::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan)}
+.panel .ph{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;
+}
+.panel .ph h3{
+  font-size:14px;font-weight:600;letter-spacing:2px;color:#d6ecff;
+  padding-left:10px;position:relative;
+}
+.panel .ph h3::before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:3px;background:linear-gradient(var(--cyan),var(--blue));border-radius:2px}
+.panel .ph .tag{font-size:11px;color:var(--dim2);letter-spacing:1px}
+.panel .ph .num-big{font-size:22px;color:var(--cyan);font-weight:700}
+
+/* KPI */
+.kpi{display:flex;flex-direction:column;justify-content:center;text-align:center;padding:16px 12px}
+.kpi .v{
+  font-size:46px;font-weight:800;font-family:"Bahnschrift","DIN Alternate",sans-serif;
+  color:var(--cyan);text-shadow:0 0 22px rgba(0,212,255,.45);
+  line-height:1.1;font-variant-numeric:tabular-nums;
+}
+.kpi .k{font-size:13px;color:var(--dim);letter-spacing:2px;margin-top:6px}
+.kpi .s{font-size:12px;color:var(--dim2);margin-top:4px}
+.kpi .unit{font-size:16px;color:var(--dim)}
+
+/* 小型指标行 */
+.mrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mcell{background:rgba(0,120,255,.06);border:1px solid rgba(0,190,255,.14);border-radius:8px;padding:8px 6px;text-align:center}
+.mcell .mv{font-size:20px;font-weight:700;color:#cfe9ff;font-variant-numeric:tabular-nums}
+.mcell .mk{font-size:11px;color:var(--dim2);margin-top:2px;letter-spacing:1px}
+
+/* 列表 */
+.list{overflow:hidden;display:flex;flex-direction:column;gap:6px}
+.li{
+  display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;
+  background:rgba(0,120,255,.05);border:1px solid rgba(0,190,255,.10);
+  font-size:12.5px;
+}
+.li .ty{flex:none;font-size:10.5px;color:#061018;background:var(--cyan);border-radius:3px;padding:1px 5px;font-weight:600}
+.li.over .ty{background:var(--red)}
+.li .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#d6ecff}
+.li .dt{flex:none;font-size:11px;color:var(--amber);font-variant-numeric:tabular-nums}
+.li.over{border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.06)}
+.li .badge{flex:none;font-size:10.5px;border-radius:3px;padding:1px 5px;color:#061018;background:var(--amber);font-weight:700}
+.empty{color:var(--dim2);font-size:12px;text-align:center;padding:18px 0}
+
+/* 图表 */
+.chart{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.chart svg{width:100%;height:100%}
+.legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.legend span{font-size:11.5px;color:var(--dim);display:flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+/* 环形 */
+.donut-wrap{display:flex;align-items:center;justify-content:center;gap:14px;flex:1;min-height:0}
+.donut-legend{display:flex;flex-direction:column;gap:5px}
+.donut-legend .dl{font-size:11.5px;color:var(--dim);display:flex;align-items:center;gap:6px}
+.donut-legend .dl i{width:9px;height:9px;border-radius:2px}
+.donut-legend .dl b{color:#d6ecff;font-weight:600;margin-left:auto;padding-left:8px}
+.donut-legend .dl em{font-style:normal;color:var(--dim2);width:36px;text-align:right}
+
+@media(max-width:1280px){
+  .main{grid-template-columns:240px 1fr 250px}
+  .kpi .v{font-size:36px}
+}
+
+.pseudo-fs{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;z-index:99999!important;overflow:auto;background:#040a14}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="l"><span class="dot"></span>SC 数智管控平台 · 安全监管中心</div>
+  <h1>安全驾驶舱<small>SAFETY COCKPIT</small></h1>
+  <div class="r"><button class="fs-btn" id="fsBtn" onclick="toggleFs()" title="切换全屏"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span>全屏</span></button><span id="clock">--</span></div>
+</div>
+
+<div class="main">
+  <!-- 左列 -->
+  <div class="col">
+    <div class="panel kpi">
+      <div class="v" id="safeDays">--</div>
+      <div class="k">安全生产天数</div>
+      <div class="s" id="safeDaysSub">自上次安全事故起</div>
+    </div>
+    <div class="panel" style="flex:1.1">
+      <div class="ph"><h3>隐患统计</h3><span class="num-big" id="hzTotal">--</span></div>
+      <div class="mrow" style="margin-bottom:8px">
+        <div class="mcell"><div class="mv" id="hzRate">--</div><div class="mk">整改率%</div></div>
+        <div class="mcell"><div class="mv" id="hzNew">--</div><div class="mk">本月新增</div></div>
+        <div class="mcell"><div class="mv" id="hzOver">--</div><div class="mk">逾期</div></div>
+      </div>
+      <div class="donut-wrap">
+        <div id="hzDonut" class="chart" style="width:130px;height:130px"></div>
+        <div class="donut-legend" id="hzLegend"></div>
+      </div>
+    </div>
+    <div class="panel" style="flex:1">
+      <div class="ph"><h3>风险等级分布</h3><span class="num-big" id="riskTotal">--</span></div>
+      <div class="donut-wrap">
+        <div id="riskDonut" class="chart" style="width:130px;height:130px"></div>
+        <div class="donut-legend" id="riskLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 中列 -->
+  <div class="center">
+    <div class="panel">
+      <div class="ph"><h3>隐患月度趋势</h3><span class="tag">近 12 个月 · 新增 / 关闭</span></div>
+      <div class="legend"><span><i style="background:var(--cyan)"></i>新增隐患</span><span><i style="background:var(--teal)"></i>关闭隐患</span></div>
+      <div id="hzTrend" class="chart"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h3>事故月度趋势</h3><span class="tag">近 12 个月 · 事故起数</span></div>
+      <div class="legend"><span><i style="background:var(--red)"></i>事故数</span></div>
+      <div id="acTrend" class="chart"></div>
+    </div>
+  </div>
+
+  <!-- 右列 -->
+  <div class="col">
+    <div class="panel" style="flex:1.2">
+      <div class="ph"><h3>待办事项</h3><span class="num-big" id="todoTotal">--</span></div>
+      <div class="list" id="todoList"></div>
+    </div>
+    <div class="panel" style="flex:1">
+      <div class="ph"><h3>到期预警</h3><span class="num-big" id="warnTotal">--</span></div>
+      <div class="list" id="warnList"></div>
+    </div>
+    <div class="panel" style="flex:.8">
+      <div class="ph"><h3>运行指标</h3></div>
+      <div class="mrow">
+        <div class="mcell"><div class="mv" id="trRate">--</div><div class="mk">培训完成%</div></div>
+        <div class="mcell"><div class="mv" id="acRate">--</div><div class="mk">事故率‰</div></div>
+        <div class="mcell"><div class="mv" id="riskCnt">--</div><div class="mk">未控风险</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function fsState(){
+  return !!(document.fullscreenElement||document.webkitFullscreenElement)||document.documentElement.classList.contains('pseudo-fs');
+}
+function enterPseudoFs(){document.documentElement.classList.add('pseudo-fs')}
+function exitPseudoFs(){document.documentElement.classList.remove('pseudo-fs')}
+function enterFs(){
+  var el=document.documentElement;
+  var p=el.requestFullscreen||el.webkitRequestFullscreen;
+  if(!p){enterPseudoFs();return}
+  try{
+    var pr=p.call(el);
+    if(pr&&pr.catch){pr.catch(function(){enterPseudoFs()})}
+    else{setTimeout(function(){if(!(document.fullscreenElement||document.webkitFullscreenElement))enterPseudoFs()},350)}
+  }catch(e){enterPseudoFs()}
+}
+function exitFs(){
+  var e=document.exitFullscreen||document.webkitExitFullscreen;
+  if(e){try{e.call(document)}catch(x){}}
+  exitPseudoFs();
+}
+function toggleFs(){
+  if(fsState()) exitFs(); else enterFs();
+}
+function updateFsBtn(){
+  var b=document.getElementById('fsBtn');if(!b)return;
+  b.querySelector('span').textContent=fsState()?'退出全屏':'全屏';
+}
+document.addEventListener('fullscreenchange',updateFsBtn);
+document.addEventListener('webkitfullscreenchange',updateFsBtn);
+
+(function(){
+var TOKEN = localStorage.getItem('sc_admin_token') || '';
+function api(url){
+  var h = {};
+  if(TOKEN) h['Authorization'] = 'Bearer ' + TOKEN;
+  return fetch('/api/' + url, {headers:h}).then(function(r){return r.json()}).catch(function(e){return {code:1,msg:String(e)}});
+}
+var C = ['#00d4ff','#3aa0ff','#fbbf24','#f87171','#34d399','#a78bfa'];
+
+/* ---------- SVG 图表工具 ---------- */
+function linePath(xs, ys){ var p=''; for(var i=0;i<xs.length;i++){ p += (i?'L':'M')+xs[i].toFixed(1)+','+ys[i].toFixed(1); } return p; }
+function areaPath(xs, ys, base){ return linePath(xs,ys) + 'L' + xs[xs.length-1].toFixed(1) + ',' + base + 'L' + xs[0].toFixed(1) + ',' + base + 'Z'; }
+
+function barChart(el, labels, series, opts){
+  if(!el) return;
+  var o = opts||{};
+  var W=800,H=240,pl=42,pr=10,pt=18,pb=26;
+  var max = 0;
+  series.forEach(function(s){ s.forEach(function(v){ if(v>max) max=v; }); });
+  if(max===0) max=1;
+  var iw=W-pl-pr, ih=H-pt-pb;
+  var n=labels.length, bw=iw/n;
+  var xAt=function(i){ return pl + bw*i + bw/2; };
+  var yAt=function(v){ return pt + ih - (v/max)*ih; };
+  var html = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">';
+  // grid
+  for(var g=0;g<=4;g++){
+    var gy = pt + ih*g/4;
+    html += '<line x1="'+pl+'" y1="'+gy+'" x2="'+(W-pr)+'" y2="'+gy+'" stroke="rgba(0,190,255,.12)" stroke-width="1"/>';
+    var gv = Math.round(max*(4-g)/4);
+    html += '<text x="'+(pl-6)+'" y="'+(gy+4)+'" fill="#4d7397" font-size="10" text-anchor="end">'+gv+'</text>';
+  }
+  // bars
+  var totalSeries = series.length;
+  series.forEach(function(s, si){
+    var bw2 = bw/(totalSeries+0.8);
+    for(var i=0;i<n;i++){
+      var x = pl + bw*i + bw*0.1 + si*bw2;
+      var hh = (s[i]/max)*ih;
+      var col = (o.colors||C)[si % 10];
+      if(si===0){ // 柱
+        html += '<rect x="'+x.toFixed(1)+'" y="'+(yAt(s[i])).toFixed(1)+'" width="'+(bw2*0.8).toFixed(1)+'" height="'+Math.max(hh,1).toFixed(1)+'" rx="2" fill="'+col+'" opacity=".9"/>';
+        html += '<rect x="'+x.toFixed(1)+'" y="'+(yAt(s[i])).toFixed(1)+'" width="'+(bw2*0.8).toFixed(1)+'" height="3" fill="#fff" opacity=".35"/>';
+      } else { // 线
+        // do nothing here (drawn below)
+      }
+    }
+  });
+  // lines
+  series.forEach(function(s, si){
+    if(si===0) return;
+    var xs=[],ys=[];
+    for(var i=0;i<n;i++){ xs.push(xAt(i)); ys.push(yAt(s[i])); }
+    var col=(o.colors||C)[si % 10];
+    html += '<path d="'+areaPath(xs,ys,pt+ih)+'" fill="'+col+'" opacity=".12"/>';
+    html += '<path d="'+linePath(xs,ys)+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+    for(var i=0;i<n;i++){
+      if(s[i]>0) html += '<circle cx="'+xs[i].toFixed(1)+'" cy="'+ys[i].toFixed(1)+'" r="2.5" fill="'+col+'"/>';
+    }
+  });
+  // x labels (thin out if too many)
+  var step = n>10 ? Math.ceil(n/8) : 1;
+  for(var i=0;i<n;i++){
+    if(i%step!==0 && i!==n-1) continue;
+    var lb = String(labels[i]).replace('-','/');
+    html += '<text x="'+xAt(i).toFixed(1)+'" y="'+(H-6)+'" fill="#7fa6c9" font-size="9.5" text-anchor="middle">'+lb+'</text>';
+  }
+  html += '</svg>';
+  el.innerHTML = html;
+}
+
+function lineChart(el, labels, series, opts){
+  if(!el) return;
+  var o = opts||{};
+  var W=800,H=240,pl=42,pr=10,pt=18,pb=26;
+  var max = 0;
+  series.forEach(function(s){ s.forEach(function(v){ if(v>max) max=v; }); });
+  if(max===0) max=1;
+  var iw=W-pl-pr, ih=H-pt-pb;
+  var n=labels.length;
+  var xAt=function(i){ return pl + (n===1?iw/2: iw*i/(n-1)); };
+  var yAt=function(v){ return pt + ih - (v/max)*ih; };
+  var html = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">';
+  for(var g=0;g<=4;g++){
+    var gy = pt + ih*g/4;
+    html += '<line x1="'+pl+'" y1="'+gy+'" x2="'+(W-pr)+'" y2="'+gy+'" stroke="rgba(0,190,255,.12)"/>';
+    html += '<text x="'+(pl-6)+'" y="'+(gy+4)+'" fill="#4d7397" font-size="10" text-anchor="end">'+Math.round(max*(4-g)/4)+'</text>';
+  }
+  series.forEach(function(s, si){
+    var xs=[],ys=[];
+    for(var i=0;i<n;i++){ xs.push(xAt(i)); ys.push(yAt(s[i])); }
+    var col=(o.colors||C)[si % 10];
+    html += '<path d="'+areaPath(xs,ys,pt+ih)+'" fill="'+col+'" opacity=".10"/>';
+    html += '<path d="'+linePath(xs,ys)+'" fill="none" stroke="'+col+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
+    for(var i=0;i<n;i++){
+      html += '<circle cx="'+xs[i].toFixed(1)+'" cy="'+ys[i].toFixed(1)+'" r="2.5" fill="'+col+'"/>';
+      if(i===n-1) html += '<circle cx="'+xs[i].toFixed(1)+'" cy="'+ys[i].toFixed(1)+'" r="4" fill="'+col+'" opacity=".35"/>';
+    }
+  });
+  var step = n>10 ? Math.ceil(n/8) : 1;
+  for(var i=0;i<n;i++){
+    if(i%step!==0 && i!==n-1) continue;
+    var lb = String(labels[i]).replace('-','/');
+    html += '<text x="'+xAt(i).toFixed(1)+'" y="'+(H-6)+'" fill="#7fa6c9" font-size="9.5" text-anchor="middle">'+lb+'</text>';
+  }
+  html += '</svg>';
+  el.innerHTML = html;
+}
+
+function donut(el, legendEl, list, total){
+  if(!el) return;
+  var sum = total>0?total:list.reduce(function(a,b){return a+(Number(b.value)||0)},0);
+  if(sum<=0){
+    el.innerHTML = '<div class="empty">暂无数据</div>';
+    if(legendEl) legendEl.innerHTML='';
+    return;
+  }
+  var R=52, r=34, cx=65, cy=65;
+  var html = '<svg viewBox="0 0 130 130" width="130" height="130">';
+  html += '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="rgba(0,190,255,.10)" stroke-width="12"/>';
+  var start=-Math.PI/2;
+  var acc=0;
+  list.forEach(function(it, i){
+    var v = Number(it.value)||0;
+    var frac = v/sum;
+    if(frac<=0) return;
+    var a1 = start + acc*2*Math.PI;
+    var a2 = start + (acc+frac)*2*Math.PI;
+    acc += frac;
+    var x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1);
+    var x2=cx+r*Math.cos(a2), y2=cy+r*Math.sin(a2);
+    var big = (a2-a1)>Math.PI?1:0;
+    var col = C[i % C.length];
+    html += '<path d="M'+x1.toFixed(1)+','+y1.toFixed(1)+' A'+r+','+r+' 0 '+big+' 1 '+x2.toFixed(1)+','+y2.toFixed(1)+'" fill="none" stroke="'+col+'" stroke-width="12"/>';
+  });
+  html += '<text x="'+cx+'" y="'+(cy+5)+'" fill="#fff" font-size="17" font-weight="700" text-anchor="middle">'+sum+'</text>';
+  html += '<text x="'+cx+'" y="'+(cy+20)+'" fill="#7fa6c9" font-size="9" text-anchor="middle">总数</text>';
+  html += '</svg>';
+  el.innerHTML = html;
+  if(legendEl){
+    var lh='';
+    list.forEach(function(it,i){
+      lh += '<div class="dl"><i style="background:'+C[i % C.length]+'"></i>'+it.name+'<em>'+(Number(it.percent)||0)+'%</em><b>'+it.value+'</b></div>';
+    });
+    legendEl.innerHTML = lh;
+  }
+}
+
+/* ---------- 数据渲染 ---------- */
+function renderOverview(d){
+  set('safeDays', d.safe_days && d.safe_days.value!==null && d.safe_days.value!==undefined ? d.safe_days.value : '--');
+  if(d.safe_days && (d.safe_days.value===null||d.safe_days.value===undefined)) set('safeDaysSub','暂无安全事故记录');
+  var hz = d.hazard_total||{}, hr = d.hazard_rate||{}, tr = d.training_rate||{}, ar = d.accident_rate||{}, rk = d.risk_total||{};
+  set('hzTotal', hz.value!==undefined?hz.value:'--');
+  set('hzRate', hr.value!==undefined?hr.value:'--');
+  set('hzNew', hz.trend_value!==undefined?hz.trend_value:'--');
+  set('trRate', tr.value!==undefined?tr.value:'--');
+  set('acRate', ar.value!==undefined?ar.value:'--');
+  set('riskCnt', rk.value!==undefined?rk.value:'--');
+  set('riskTotal', rk.value!==undefined?rk.value:'--');
+}
+function renderTrend(el, d){
+  var labels=d.months||[], f=d.found||[], c=d.closed||[];
+  if(!labels.length){ if(el) el.innerHTML='<div class="empty">暂无数据</div>'; return; }
+  barChart(el, labels, [f,c], {});
+}
+function renderAcTrend(el, d){
+  var labels=d.months||[], c=d.counts||[];
+  if(!labels.length){ if(el) el.innerHTML='<div class="empty">暂无数据</div>'; return; }
+  lineChart(el, labels, [c], {colors:['#f87171']});
+}
+function renderHazardLevel(d){
+  donut(document.getElementById('hzDonut'), document.getElementById('hzLegend'), d.list||[], d.total||0);
+}
+function renderRiskLevel(d){
+  donut(document.getElementById('riskDonut'), document.getElementById('riskLegend'), d.list||[], d.total||0);
+}
+var TYPE_ICON={hazard:'整改',inspection:'检查',training:'培训',exam:'考试',measure:'措施',certificate:'证书',device:'年检',risk:'复评'};
+function renderTodos(d){
+  var list=d.list||[], total=d.total||list.length;
+  set('todoTotal', total);
+  var el=document.getElementById('todoList');
+  if(!list.length){ el.innerHTML='<div class="empty">暂无待办事项</div>'; return; }
+  var h='';
+  list.forEach(function(it){
+    var ty=TYPE_ICON[it.type]||(it.type_label||'待办');
+    var cls = it.overdue?'li over':'li';
+    h += '<div class="'+cls+'"><span class="ty">'+ty+'</span><span class="nm">'+it.name+'</span>'+(it.overdue?'<span class="badge">超期</span>':'<span class="dt">'+String(it.deadline||'').slice(5)+'</span>')+'</div>';
+  });
+  el.innerHTML=h;
+}
+function renderWarnings(d){
+  var list=d.list||[], total=d.total||list.length;
+  set('warnTotal', total);
+  var el=document.getElementById('warnList');
+  if(!list.length){ el.innerHTML='<div class="empty">暂无到期预警</div>'; return; }
+  var h='';
+  list.forEach(function(it){
+    var ty=TYPE_ICON[it.type]||(it.type_label||'预警');
+    var dl=Number(it.days_left);
+    h += '<div class="li"><span class="ty">'+ty+'</span><span class="nm">'+it.name+'</span><span class="dt"'+(dl<=7?' style="color:#f87171"':'')+'>'+dl+'天</span></div>';
+  });
+  el.innerHTML=h;
+}
+function set(id, v){ var e=document.getElementById(id); if(e) e.textContent = v; }
+
+/* ---------- 加载 ---------- */
+function loadAll(){
+  api('safety/dashboard/overview').then(function(j){ if(j.code===0 && j.data) renderOverview(j.data); });
+  api('safety/dashboard/hazard-trend?months=12').then(function(j){ if(j.code===0 && j.data) renderTrend(document.getElementById('hzTrend'), j.data); });
+  api('safety/dashboard/accident-trend?months=12').then(function(j){ if(j.code===0 && j.data) renderAcTrend(document.getElementById('acTrend'), j.data); });
+  api('safety/dashboard/hazard-level').then(function(j){ if(j.code===0 && j.data) renderHazardLevel(j.data); });
+  api('safety/dashboard/risk-level').then(function(j){ if(j.code===0 && j.data) renderRiskLevel(j.data); });
+  api('safety/dashboard/todos').then(function(j){ if(j.code===0 && j.data) renderTodos(j.data); });
+  api('safety/dashboard/upcoming-warnings').then(function(j){ if(j.code===0 && j.data) renderWarnings(j.data); });
+}
+
+function clock(){
+  var n=new Date();
+  var s = n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  var e=document.getElementById('clock'); if(e) e.textContent=s;
+}
+loadAll();
+clock(); setInterval(clock,1000);
+setInterval(loadAll, 60000);
+})();
+</script>
+</body>
+</html>

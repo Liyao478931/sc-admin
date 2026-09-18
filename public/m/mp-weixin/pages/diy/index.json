@@ -1,0 +1,12 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "u-icon": "../../node-modules/uview-plus/components/u-icon/u-icon",
+    "u-input": "../../node-modules/uview-plus/components/u-input/u-input",
+    "custom-tab-bar": "../../components/CustomTabBar",
+    "workbench-center": "../../components/WorkbenchCenter",
+    "messages-center": "../../components/MessagesCenter",
+    "contacts-center": "../../components/ContactsCenter",
+    "biz-data-list": "../../components/diy-biz/BizDataList"
+  }
+}

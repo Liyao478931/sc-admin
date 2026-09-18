@@ -1,0 +1,1 @@
+import{_ as a,c as s,w as e,i as r,p as o,v as t,aH as n}from"./index-DoUx5fAv.js";const c=a({data:()=>({viewUrl:""}),onLoad(a){this.viewUrl=decodeURIComponent(a.url||"")}},[["render",function(a,c,d,l,i,p){const u=n,v=r;return o(),s(v,{class:"wv-page"},{default:e(()=>[t(u,{src:i.viewUrl},null,8,["src"])]),_:1})}],["__scopeId","data-v-67fbcab9"]]);export{c as default};
