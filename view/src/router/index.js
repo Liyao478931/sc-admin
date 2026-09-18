@@ -528,6 +528,8 @@ const router = new Router({ routes, mode: 'hash', base: '/admin/' })
 let permRefreshed = false
 
 router.beforeEach(async (to, from, next) => {
+  // 独立大屏页面（.html 结尾）直接整页跳转，不走 SPA 路由，避免空白页
+  if (to.path && to.path.indexOf('.html') >= 0) { window.location.href = to.path; return }
   const pageTitle = to.meta.title || '加载中...'
   window.__pageTitle = pageTitle
   document.title = pageTitle
