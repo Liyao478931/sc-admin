@@ -1,0 +1,2 @@
+<?php
+ return [ 'default_lang' => env('DEFAULT_LANG', 'zh-cn'), 'auto_detect_browser' => true, 'allow_lang_list' => [], 'detect_var' => 'lang', 'use_cookie' => true, 'cookie_var' => 'think_lang', 'header_var' => 'think-lang', 'extend_list' => [], 'accept_language' => [ 'zh-hans-cn' => 'zh-cn', ], 'allow_group' => false, ]; 

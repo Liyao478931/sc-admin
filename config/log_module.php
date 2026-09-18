@@ -1,0 +1,2 @@
+<?php
+ return [ 'enabled' => true, 'record_get' => false, 'record_response' => true, 'max_param_length' => 2000, 'sensitive_fields' => 'password,secret,token,code,old_password', 'auto_clean' => true, 'retain_days' => 180, 'clean_time' => '02:00', 'notify_before_clean' => false, 'notify_write_fail' => true, 'notify_abnormal_login' => true, 'notify_storage_warning' => true, 'storage_threshold' => 80, 'module_translations' => [], 'action_translations' => [], 'loggable_models' => [], 'exclude_fields' => ['password', 'salt', 'token', 'secret', 'private_key'], ]; 

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "维修任务",
+  "usingComponents": {
+    "repair-task-card": "./components/RepairTaskCard",
+    "u-empty": "../../../node-modules/uview-plus/components/u-empty/u-empty"
+  }
+}

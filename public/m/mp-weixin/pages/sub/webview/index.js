@@ -1,0 +1,1 @@
+"use strict";const e=require("../../../common/vendor.js"),r={data:()=>({viewUrl:""}),onLoad(e){this.viewUrl=decodeURIComponent(e.url||"")}};const o=e._export_sfc(r,[["render",function(e,r,o,t,n,c){return{a:n.viewUrl}}],["__scopeId","data-v-67fbcab9"]]);wx.createPage(o);

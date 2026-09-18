@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>设备详情</title>
+<style>
+:root {
+  --brand: #409EFF;
+  --bg: #f2f4f8;
+  --card: #ffffff;
+  --radius: 14px;
+  --shadow: 0 4px 16px rgba(31,45,61,.06);
+  --text: #1f2d3d;
+  --sub: #909399;
+  --line: #ebeef5;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { background:#f2f4f8; font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif; color:var(--text); font-size:14px; min-height:100vh; }
+.page { max-width:480px; margin:0 auto; padding:14px 14px 96px; }
+
+/* ===== 卡片 ===== */
+.card { background:var(--card); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:var(--shadow); }
+
+/* ===== 设备头部 ===== */
+.device-head { text-align:center; padding:6px 0 2px; }
+.device-img { width:100%; height:auto; max-height:260px; object-fit:cover; border-radius:10px; margin-top:12px; }
+.dh-status { margin-bottom:10px; }
+.dh-name { font-size:21px; font-weight:700; margin-bottom:6px; }
+.dh-code { color:var(--sub); font-size:12px; }
+
+/* ===== 状态标签 ===== */
+.status-tag { display:inline-flex; align-items:center; padding:4px 13px; border-radius:999px; font-size:12px; font-weight:600; line-height:1; }
+
+/* ===== 信息列表 ===== */
+.section-title { display:flex; align-items:center; font-size:15px; font-weight:600; margin-bottom:12px; }
+.section-title::before { content:''; width:4px; height:14px; border-radius:2px; background:var(--brand); margin-right:8px; }
+.info-list { display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
+.info-item { display:flex; padding:7px 0; font-size:13px; border-bottom:1px solid #f5f7fa; }
+.info-item.full { grid-column:1 / -1; }
+.info-item .lb { color:var(--sub); width:74px; flex-shrink:0; }
+.info-item .val { color:var(--text); word-break:break-all; }
+
+/* ===== 备注 ===== */
+.remark-text { font-size:13px; line-height:1.8; color:#4b5a6c; }
+
+/* ===== 待执行任务 ===== */
+.task-item { display:flex; justify-content:space-between; align-items:center; padding:13px 0; border-bottom:1px solid #f5f7fa; }
+.task-item:last-child { border-bottom:none; }
+.task-tag { display:inline-block; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:600; }
+.task-name { font-size:14px; font-weight:500; margin-top:5px; }
+.task-date { color:var(--sub); font-size:12px; margin-top:3px; }
+.task-btn { padding:7px 16px; border-radius:999px; background:var(--brand); color:#fff; font-size:12px; border:none; cursor:pointer; transition:transform .15s, opacity .15s; }
+.task-btn:active { transform:scale(.94); opacity:.85; }
+
+/* ===== 巡检记录 ===== */
+.record-item { padding:11px 0; border-bottom:1px solid #f5f7fa; }
+.record-item:last-child { border-bottom:none; }
+.record-time { font-size:13px; font-weight:500; }
+.record-meta { color:var(--sub); font-size:12px; margin-top:4px; }
+.link-all { color:var(--brand); font-size:13px; text-align:center; margin-top:12px; cursor:pointer; font-weight:500; }
+
+/* ===== 底部操作栏 ===== */
+.bottom-bar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); padding:10px 16px calc(10px + env(safe-area-inset-bottom)); box-shadow:0 -4px 16px rgba(31,45,61,.06); z-index:9; }
+.btn { display:block; width:100%; padding:13px; border:none; border-radius:999px; background:var(--brand); color:#fff; font-size:15px; font-weight:600; text-align:center; cursor:pointer; transition:transform .15s, opacity .15s; }
+.btn:active { transform:scale(.97); opacity:.88; }
+.btn.secondary { background:#fff; color:var(--brand); border:1.5px solid var(--brand); }
+
+/* ===== 状态区（加载/错误） ===== */
+.state-box { text-align:center; padding:90px 24px; color:var(--sub); }
+.spinner { width:34px;height:34px;border:3px solid #e3e8f0;border-top-color:var(--brand);border-radius:50%;margin:0 auto 16px;animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.state-emoji { font-size:44px; margin-bottom:12px; }
+
+/* ===== 页脚 / 空态 / 引导 ===== */
+.footer { text-align:center; color:#c0c4cc; font-size:12px; padding:22px 0 8px; line-height:1.7; }
+.empty { text-align:center; color:#c0c4cc; padding:22px 0; font-size:13px; }
+.guide-box { background:var(--card); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:var(--shadow); }
+.guide-box .tip { color:var(--sub); font-size:13px; line-height:1.8; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div id="app">
+    <div id="state-loading" class="state-box"><div class="spinner"></div><div>加载中...</div></div>
+    <div id="state-error" class="state-box" style="display:none">
+      <div class="state-emoji">😕</div>
+      <div id="error-msg">设备不存在或加载失败</div>
+      <button class="btn" style="width:120px;margin:18px auto 0" onclick="location.reload()">重试</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ 工具 ============
+var API_BASE = window.location.origin;
+function getDeviceCode() {
+  var path = location.pathname;
+  var m = path.match(/\/m\/device\/([^\/?]+)/);
+  return m ? decodeURIComponent(m[1]) : (new URLSearchParams(location.search).get('code') || '');
+}
+function request(url, options) {
+  options = options || {};
+  var headers = options.headers || {};
+  var token = localStorage.getItem('token') || localStorage.getItem('access_token') || '';
+  if (token && !options.noAuth) headers.Authorization = 'Bearer ' + token;
+  return fetch(url, { headers: headers, method: options.method || 'GET', body: options.body || null }).then(function (r) { return r.json(); });
+}
+function getStatusStyle(status) {
+  var map = {
+    'in_use':      { label:'在用',   color:'#2f9e44', bg:'rgba(47,158,68,.12)' },
+    'repairing':   { label:'维修中', color:'#e67700', bg:'rgba(230,119,0,.12)' },
+    'idle':        { label:'闲置',   color:'#868e96', bg:'rgba(134,142,150,.14)' },
+    'scrapped':    { label:'报废',   color:'#e03131', bg:'rgba(224,49,49,.12)' },
+    'transferred': { label:'已调拨', color:'#1971c2', bg:'rgba(25,113,194,.12)' },
+  };
+  return map[status] || { label: status || '未知', color: '#868e96', bg: 'rgba(134,142,150,.14)' };
+}
+var state = { device: null, tasks: [], records: [], footer: null, brand: null };
+
+function kv(label, value, full) {
+  return '<div class="info-item' + (full ? ' full' : '') + '"><div class="lb">' + label + '</div><div class="val">' + (value || '-') + '</div></div>';
+}
+function footer() {
+  var f = state.footer || {};
+  var parts = [];
+  if (f.copyright) parts.push(f.copyright);
+  if (f.show_icp && f.icp) parts.push(f.icp);
+  if (f.show_police && f.police) parts.push(f.police);
+  return '<div class="footer">' + (parts.length ? parts.join(' | ') : '华能装备 · 设备管理系统') + '</div>';
+}
+/** 基础设备详情（游客 / 完整模式共用） */
+function renderBase(device) {
+  var st = getStatusStyle(device.status);
+  var img = device.image ? '<img class="device-img" src="' + device.image + '" alt="设备图片">' : '';
+  var extHtml = (device.ext && device.ext.length) ? device.ext.map(function (e) {
+    return kv(e.label, e.value);
+  }).join('') : '';
+  var remarkHtml = device.remark ? '<div class="card"><div class="section-title">备注</div><div class="remark-text">' + device.remark + '</div></div>' : '';
+  return '<div class="card"><div class="device-head">' +
+    '<div class="dh-status"><span class="status-tag" style="background:' + st.bg + ';color:' + st.color + '">' + st.label + '</span></div>' +
+    '<div class="dh-name">' + device.name + '</div>' +
+    '<div class="dh-code">编码：' + device.device_code + '</div>' + img +
+    '</div></div>' +
+    '<div class="card"><div class="section-title">基本信息</div><div class="info-list">' +
+    kv('设备类型', device.device_type_label) + kv('型号', device.model) + kv('品牌', device.brand) + kv('生产厂家', device.manufacturer) +
+    kv('规格参数', device.specification) + kv('采购价格', device.purchase_price) +
+    kv('采购日期', device.purchase_date) + kv('投入使用', device.put_into_use_date) +
+    kv('所属部门', device.department_name) + kv('存放位置', device.location) + kv('负责人', device.manager_name) + kv('供应商', device.supplier_name) +
+    kv('所属分类', device.category_path, true) +
+    '</div></div>' +
+    (extHtml ? '<div class="card"><div class="section-title">扩展信息</div><div class="info-list">' + extHtml + '</div></div>' : '') +
+    remarkHtml;
+}
+function renderWechat(device) {
+  return renderBase(device) + footer();
+}
+function renderGuest(device) {
+  return renderBase(device) + footer();
+}
+function renderApp(device) {
+  var st = getStatusStyle(device.status);
+  var recordsHtml = state.records.length ? state.records.map(function (r) {
+    return '<div class="record-item"><div class="record-time">' + (r.inspect_time || r.create_time || '') + '</div>' +
+      '<div class="record-meta">检查项 ' + (r.item_count || 0) + ' 项 · 异常 ' + (r.abnormal_count || 0) + ' 项</div></div>';
+  }).join('') : '<div class="empty">暂无巡检记录</div>';
+  return '<div class="card"><div class="device-head" style="text-align:left;padding:0">' +
+      '<div class="dh-name" style="font-size:17px">' + device.name + '</div>' +
+      '<div class="dh-code" style="margin:6px 0 0">' + device.device_code + '　<span class="status-tag" style="background:' + st.bg + ';color:' + st.color + '">' + st.label + '</span></div>' +
+      '<div class="dh-code" style="margin-top:6px">' + (device.model || '') + ' · ' + (device.department_name || '未分配部门') + '</div>' +
+      '</div></div>' +
+    '<div class="card"><div class="section-title">待执行任务</div><div id="task-area"><div class="empty">加载中...</div></div></div>' +
+    '<div class="card"><div class="section-title">最近巡检记录</div>' + recordsHtml +
+    '<div class="link-all" data-action="all-records">查看全部巡检记录 ›</div></div>' +
+    '<div class="bottom-bar"><button class="btn" data-action="full-detail">查看设备完整详情</button></div>' + footer();
+}
+function render() {
+  var device = state.device;
+  if (!device) return;
+  var ua = navigator.userAgent;
+  var isWechat = /MicroMessenger/i.test(ua);
+  var isApp = /SCAdmin/i.test(ua) || (location.search.indexOf('from=app') > -1);
+  var isLogin = !!(localStorage.getItem('token') || localStorage.getItem('access_token'));
+  // 完整详情模式：?full=1 时渲染完整信息（基本信息/扩展信息/备注）
+  var isFull = location.search.indexOf('full=1') > -1;
+  var loadingEl = document.getElementById('state-loading');
+  var errorEl = document.getElementById('state-error');
+  if (loadingEl) loadingEl.style.display = 'none';
+  if (errorEl) errorEl.style.display = 'none';
+  var box = document.getElementById('app');
+  if (isFull) {
+    box.innerHTML = renderBase(device) +
+      '<div class="bottom-bar"><button class="btn secondary" onclick="goBack(\'' + device.device_code + '\')">返回</button></div>' + footer();
+  } else if (isWechat && !isLogin) box.innerHTML = renderWechat(device);
+  else if ((isApp || isLogin) && isLogin) box.innerHTML = renderApp(device);
+  else if (!isLogin) box.innerHTML = renderGuest(device);
+  else box.innerHTML = renderBase(device) + '<div class="guide-box"><div class="tip">已登录 · 可在 App 中执行巡检</div></div>' + footer();
+}
+function tryOpenApp(code) {
+  location.href = 'scadmin://device/' + code;
+  setTimeout(function () { alert('如未跳转，请安装 App 后使用。'); }, 1200);
+}
+function goBack(code) {
+  if (typeof wx !== 'undefined' && wx.miniProgram) {
+    wx.miniProgram.navigateBack({ delta: 1 })
+  } else {
+    location.href = '/m/device/' + code;
+  }
+}
+function startInspection(code, taskId) {
+  // 不改 URL，直接在当前页内加载巡检页（无独立 H5 页面时显示占位）
+  location.href = '/m/inspection?device_code=' + encodeURIComponent(code) + '&task_id=' + encodeURIComponent(taskId)
+}
+function viewAllRecords(code) {
+  // 不改 URL，直接在当前页内展示全部巡检记录
+  var device = state.device;
+  if (!device) return;
+  document.getElementById('app').innerHTML = '<div class="card"><div class="section-title">全部巡检记录</div><div class="empty">功能开发中</div></div>' +
+    '<div class="bottom-bar"><button class="btn secondary" onclick="render()">返回</button></div>' + footer();
+}
+function viewFullDetail(code) {
+  // 不改 URL，直接在当前页内切换到完整详情视图（避免微信授权流重定向丢失参数）
+  var device = state.device;
+  if (!device || device.device_code !== code) return;
+  document.getElementById('state-loading').style.display = 'none';
+  document.getElementById('state-error').style.display = 'none';
+  document.getElementById('app').innerHTML = renderBase(device) +
+    '<div class="bottom-bar"><button class="btn secondary" onclick="render()">返回</button></div>' + footer();
+}
+
+function loadTasksAndRecords(code) {
+  // 待执行任务汇总：巡检 + 保养 + 维修（需登录，按当前执行人过滤）
+  // 异步加载完成后重渲染任务区（避免同步 render 时 tasks 为空）
+  request(API_BASE + '/api/device/public/pending-tasks?device_code=' + encodeURIComponent(code))
+    .then(function (r) {
+      if (r && r.code === 0 && r.data) state.tasks = r.data.list || [];
+      else state.tasks = [];
+      renderTasks();
+    })
+    .catch(function () { state.tasks = []; renderTasks(); });
+  request(API_BASE + '/api/device/inspection/records?device_code=' + encodeURIComponent(code) + '&limit=3', { noAuth: true })
+    .then(function (r) { if (r && r.code === 0 && r.data) state.records = r.data.list || r.data || []; })
+    .catch(function () { state.records = []; });
+}
+/** 单独渲染"待执行任务"区域（异步数据就绪后调用） */
+function renderTasks() {
+  var taskEl = document.getElementById('task-area');
+  if (!taskEl) return;
+  var isLogin = !!(localStorage.getItem('token') || localStorage.getItem('access_token'));
+  if (!isLogin || !state.device) { taskEl.innerHTML = '<div class="empty">请先登录查看待执行任务</div>'; return; }
+  var typeMap = { inspection:['巡检','#409EFF'], maintenance:['保养','#2f9e44'], repair:['维修','#e67700'] };
+  var tasksHtml = state.tasks.length ? state.tasks.map(function (t) {
+    var tc = typeMap[t.type] || ['任务','#868e96'];
+    var statusText = t.status === 'overdue' ? '（已逾期）' : '';
+    // 按任务类型生成执行页跳转链接（保养/维修→执行页；巡检→巡检任务）
+    var execPath = t.type === 'maintenance' ? '/h5/#/pages/sub/maintenance/execute?task_id=' + t.target_id
+      : t.type === 'repair' ? '/h5/#/pages/sub/repair/execute?task_id=' + t.target_id
+      : '/h5/#/pages/sub/maintenance/task-list';
+    return '<div class="task-item"><div><span class="task-tag" style="background:' + tc[1] + '22;color:' + tc[1] + '">' + (t.type_label || tc[0]) + '</span>' +
+      '<div class="task-name">' + (t.task_code || '任务') + statusText + '</div><div class="task-date">计划：' + (t.due_date || '') + '</div></div>' +
+      '<button class="task-btn" onclick="location.href=\'' + execPath + '\'">' + (t.type === 'inspection' ? '去巡检' : '去执行') + '</button></div>';
+  }).join('') : '<div class="empty">暂无待执行任务</div>';
+  taskEl.innerHTML = tasksHtml;
+}
+function showError(msg) {
+  document.getElementById('state-loading').style.display = 'none';
+  document.getElementById('state-error').style.display = 'block';
+  document.getElementById('error-msg').textContent = msg;
+}
+function loadContent(code) {
+  // 加载页脚版权配置（公开接口，后台界面配置中可修改）
+  request(API_BASE + '/api/settings/footer-config', { noAuth: true })
+    .then(function (r) { if (r && r.code === 0 && r.data) { state.footer = r.data; render(); } })
+    .catch(function () {});
+  request(API_BASE + '/api/device/public/detail?device_code=' + encodeURIComponent(code), { noAuth: true })
+    .then(function (r) {
+      if (r && r.code === 0 && r.data) {
+        state.device = r.data;
+        loadTasksAndRecords(code);
+        render();
+      } else { showError(r && r.msg ? r.msg : '设备不存在'); }
+    })
+    .catch(function () { showError('网络异常，请稍后重试'); });
+}
+function init() {
+  var code = getDeviceCode();
+  if (!code) { showError('缺少设备编码'); return; }
+
+  // ===== 微信自动识别员工身份 =====
+  var ua = navigator.userAgent;
+  var isWechat = /MicroMessenger/i.test(ua);
+  var urlParams = new URLSearchParams(location.search);
+  // 回调带 wx=ok&token → 存储 token
+  var wxToken = urlParams.get('token');
+  if (urlParams.get('wx') === 'ok' && wxToken) {
+    localStorage.setItem('token', wxToken);
+    localStorage.setItem('access_token', wxToken);
+    // 清理 URL 参数
+    var cleanUrl = location.pathname + (urlParams.get('code') ? '' : '');
+    history.replaceState(null, '', cleanUrl);
+  }
+  var isAuthCallback = urlParams.get('wx') === 'ok' || urlParams.get('wx') === 'noauth' || urlParams.get('code');
+  // 微信内置浏览器中，只要不是授权回调，一律走静默授权以当前微信号校验身份：
+  // 已绑定员工 → 返回 wx=ok 刷新 token；未绑定 → wx=noauth 清除残留 token，仅可查看设备详情
+  if (isWechat && !isAuthCallback) {
+    request(API_BASE + '/api/device/public/wechat-auth-url?redirect=' + encodeURIComponent(location.pathname), { noAuth: true })
+      .then(function (r) {
+        if (r && r.code === 0 && r.data && r.data.url) {
+          location.href = r.data.url;
+        } else {
+          // 公众号未配置/授权不可用：按本地登录态降级，保证设备详情可看
+          loadContent(code);
+        }
+      })
+      .catch(function () { loadContent(code); });
+    return; // 等待授权回调
+  }
+  // 回调 wx=noauth（当前微信未绑定员工）：清除残留登录态，仅显示设备详情
+  if (urlParams.get('wx') === 'noauth') {
+    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
+  }
+
+  loadContent(code);
+}
+
+// ===== 事件委托监听 =====
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('[DeviceDetail] 事件委托已绑定');
+  document.getElementById('app').addEventListener('click', function(e) {
+    var el = e.target.closest('[data-action]');
+    if (!el) return;
+    var action = el.getAttribute('data-action');
+    console.log('[DeviceDetail] 点击事件触发, action:', action);
+    if (action === 'full-detail') showFullDetail();
+    else if (action === 'all-records') showAllRecords();
+    else if (action === 'back') render();
+  });
+});
+
+// ===== 处理函数 =====
+function showFullDetail() {
+  var device = state.device;
+  if (!device) return;
+  var loadingEl = document.getElementById('state-loading');
+  var errorEl = document.getElementById('state-error');
+  if (loadingEl) loadingEl.style.display = 'none';
+  if (errorEl) errorEl.style.display = 'none';
+  document.getElementById('app').innerHTML = renderBase(device) +
+    '<div class="bottom-bar"><button class="btn secondary" data-action="back">返回</button></div>' + footer();
+}
+
+function showAllRecords() {
+  var device = state.device;
+  if (!device) return;
+  var loadingEl = document.getElementById('state-loading');
+  var errorEl = document.getElementById('state-error');
+  if (loadingEl) loadingEl.style.display = 'none';
+  if (errorEl) errorEl.style.display = 'none';
+  document.getElementById('app').innerHTML = '<div class="card"><div class="section-title">全部巡检记录</div><div class="empty">功能开发中</div></div>' +
+    '<div class="bottom-bar"><button class="btn secondary" data-action="back">返回</button></div>' + footer();
+}
+
+init();
+</script>
+</body>
+</html>

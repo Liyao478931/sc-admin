@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "我的待办",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "u-empty": "../../node-modules/uview-plus/components/u-empty/u-empty",
+    "u-icon": "../../node-modules/uview-plus/components/u-icon/u-icon",
+    "u-textarea": "../../node-modules/uview-plus/components/u-textarea/u-textarea",
+    "u-popup": "../../node-modules/uview-plus/components/u-popup/u-popup",
+    "u-input": "../../node-modules/uview-plus/components/u-input/u-input"
+  }
+}

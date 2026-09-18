@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="refresh" content="2;url=/admin/">
+<title>安装完成 - 数智管控平台 系统安装</title>
+<link rel="stylesheet" href="/install/css/installer.css">
+</head>
+<body class="center">
+<div class="wrap narrow">
+  <div class="card center">
+    <div class="icon">✓</div>
+    <h1>安装成功！</h1>
+    <p>数智管控平台 系统已成功安装，请妥善保管以下管理员账号信息。</p>
+    <div class="info">
+      <div class="info-item"><span class="k">管理员账号</span><span class="v">{{username}}</span></div>
+      <div class="info-item"><span class="k">管理员邮箱</span><span class="v">{{email}}</span></div>
+      <div class="info-item"><span class="k">后台地址</span><span class="v">/admin/</span></div>
+    </div>
+    <div class="tip">
+      <strong>安全提示：</strong><br>
+      1. 建议登录后立即修改密码；<br>
+      2. 如需重新安装，请删除 config/install.lock 和 .env 文件（注意：会清空所有数据）。
+    </div>
+    <a class="btn primary" href="/admin/">立即进入后台</a>
+    <p class="auto-jump">3 秒后自动跳转后台登录页...</p>
+  </div>
+  <div class="footer">© 2026 数智管控平台</div>
+</div>
+<script>
+// 安装完成自动跳转后台登录页
+setTimeout(function () {
+  window.location.href = '/admin/';
+}, 3000);
+</script>
+</body>
+</html>

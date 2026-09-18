@@ -1,0 +1,1 @@
+<view class="m-icon data-v-a4705aea" style="{{'width:' + e + ';' + ('height:' + f)}}"><image wx:if="{{a}}" class="data-v-a4705aea" src="{{b}}" style="{{'width:' + c + ';' + ('height:' + d)}}" mode="aspectFit"/></view>

@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "material-edit-dialog": "./components/MaterialEditDialog",
+    "u-textarea": "../../../node-modules/uview-plus/components/u-textarea/u-textarea"
+  }
+}

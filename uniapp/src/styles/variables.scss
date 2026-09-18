@@ -1,0 +1,42 @@
+// SCSS 全局变量定义
+// 颜色
+$uni-color-primary: #007AFF;
+$uni-color-success: #4CD964;
+$uni-color-warning: #F5A623;
+$uni-color-error: #DD524D;
+
+// 文字颜色
+$uni-text-color: #333333;
+$uni-text-color-inverse: #FFFFFF;
+$uni-text-color-grey: #999999;
+$uni-text-color-placeholder: #808080;
+$uni-text-color-disable: #C0C0C0;
+
+// 背景色
+$uni-bg-color: #FFFFFF;
+$uni-bg-color-grey: #F8F8F8;
+$uni-bg-color-hover: #F1F1F1;
+$uni-bg-color-mask: rgba(0, 0, 0, 0.4);
+
+// 边框
+$uni-border-color: #E5E5E5;
+
+// 字号
+$uni-font-size-sm: 24rpx;
+$uni-font-size-base: 28rpx;
+$uni-font-size-lg: 32rpx;
+$uni-font-size-xl: 36rpx;
+
+// 间距
+$uni-spacing-row-sm: 10rpx;
+$uni-spacing-row-base: 20rpx;
+$uni-spacing-row-lg: 30rpx;
+$uni-spacing-col-sm: 8rpx;
+$uni-spacing-col-base: 16rpx;
+$uni-spacing-col-lg: 24rpx;
+
+// 圆角
+$uni-border-radius-sm: 4rpx;
+$uni-border-radius-base: 6rpx;
+$uni-border-radius-lg: 12rpx;
+$uni-border-radius-circle: 50%;

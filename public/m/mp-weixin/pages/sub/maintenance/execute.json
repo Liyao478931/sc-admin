@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "u-textarea": "../../../node-modules/uview-plus/components/u-textarea/u-textarea"
+  }
+}

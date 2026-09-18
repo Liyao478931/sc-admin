@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "扣分明细",
+  "usingComponents": {
+    "u-empty": "../../node-modules/uview-plus/components/u-empty/u-empty",
+    "u-button": "../../node-modules/uview-plus/components/u-button/u-button"
+  }
+}

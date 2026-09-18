@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "u-textarea": "../../../node-modules/uview-plus/components/u-textarea/u-textarea",
+    "u-empty": "../../../node-modules/uview-plus/components/u-empty/u-empty"
+  }
+}

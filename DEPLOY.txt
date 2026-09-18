@@ -1,0 +1,11 @@
+# 部署后配置（通用包模式）：
+1) 数据库：建库并导入 database.sql
+2) .env：配置 DB/Redis/JWT
+3) 授权联动（客户自助购买授权后填写）：
+   AA_VERIFY_URL = https://aa.yywyrh.cn/api/v1/verify
+   AA_PROJECT_CODE = SC_ADMIN
+   AA_INSTALL_DOMAIN = （留空则自动使用当前访问域名，可显式指定）
+   AA_LICENSE_KEY = （填写你在 AA 平台购买的授权码，如 SC_ADMIN-XXXXXXXX）
+4) 安装 beast（随包 beast.so / bash install.sh）
+5) nginx root 指向 public/，运行 bash setup-nginx.sh（nginx+beast+cron）
+6) 首次访问站点即自动完成授权绑定；授权码与首次绑定的域名一一对应，换域名需重新购买

@@ -1,0 +1,68 @@
+// uni.scss - 现代靛蓝主题（v2）2026-09-11
+// 由 vite.config.js additionalData 自动注入
+
+// ===== 品牌色 =====
+$uni-color-primary: #4F46E5;            // 靛蓝主色
+$uni-color-primary-light: #EEF0FE;      // 主色浅底
+$uni-color-primary-gradient: linear-gradient(135deg, #4F46E5 0%, #7C6FF0 100%); // 品牌渐变
+$uni-color-success: #10B981;
+$uni-color-warning: #F59E0B;
+$uni-color-error: #EF4444;
+
+// ===== 文字色 =====
+$uni-text-color: #1A2332;
+$uni-text-color-inverse: #FFFFFF;
+$uni-text-color-grey: #8A9AA8;
+$uni-text-color-placeholder: #AAB6C4;
+$uni-text-color-disable: #C6D0DB;
+
+// ===== 背景色 =====
+$uni-bg-color: #FFFFFF;
+$uni-bg-color-grey: #F4F6FB;
+$uni-bg-color-hover: #EDF0F8;
+$uni-bg-color-mask: rgba(15, 23, 42, 0.45);
+
+// ===== 边框 =====
+$uni-border-color: #E7ECF4;
+
+// ===== 字号 =====
+$uni-font-size-sm: 24rpx;
+$uni-font-size-base: 28rpx;
+$uni-font-size-lg: 32rpx;
+$uni-font-size-xl: 36rpx;
+
+// ===== 间距 =====
+$uni-spacing-row-sm: 10rpx;
+$uni-spacing-row-base: 20rpx;
+$uni-spacing-row-lg: 30rpx;
+$uni-spacing-col-sm: 8rpx;
+$uni-spacing-col-base: 16rpx;
+$uni-spacing-col-lg: 24rpx;
+
+// ===== 圆角（大圆角现代风）=====
+$uni-border-radius-sm: 12rpx;
+$uni-border-radius-base: 16rpx;
+$uni-border-radius-lg: 24rpx;
+$uni-border-radius-circle: 50%;
+
+// ===== 阴影 =====
+$uni-shadow-card: 0 8rpx 24rpx rgba(79, 70, 229, 0.06);
+$uni-shadow-float: 0 12rpx 32rpx rgba(15, 23, 42, 0.12);
+
+// ===== uview-plus 主题覆盖（CSS 变量，作用于 u- 组件）=====
+$u-primary: #4F46E5;
+$u-primary-dark: #4338CA;
+$u-primary-disabled: #A5B4FC;
+$u-primary-light: #EEF0FE;
+$u-main-color: #1A2332;
+$u-content-color: #4A5568;
+$u-tips-color: #8A9AA8;
+$u-light-color: #C6D0DB;
+$u-border-color: #E7ECF4;
+$u-bg-color: #F4F6FB;
+$u-bg-color-light: #F8FAFD;
+$u-border-radius: 12px;
+$u-border-radius-small: 8px;
+$u-border-radius-large: 16px;
+
+@import "uview-plus/theme.scss";

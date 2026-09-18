@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "团队考核看板",
+  "usingComponents": {
+    "u-icon": "../../node-modules/uview-plus/components/u-icon/u-icon",
+    "u-empty": "../../node-modules/uview-plus/components/u-empty/u-empty"
+  }
+}

@@ -1,0 +1,125 @@
+<?php
+/*
+ * Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+namespace TencentCloud\Cwp\V20180228\Models;
+use TencentCloud\Common\AbstractModel;
+
+/**
+ * ModifyNetAttackSetting请求参数结构体
+ *
+ * @method integer getNetAttackEnable() 获取<p>0 关闭网络攻击检测，1开启网络攻击检测</p>
+ * @method void setNetAttackEnable(integer $NetAttackEnable) 设置<p>0 关闭网络攻击检测，1开启网络攻击检测</p>
+ * @method integer getNetAttackAlarmStatus() 获取<p>0 新增告警事件默认待处理，1新增告警事件默认已处理，3新增告警事件默认忽略</p>
+ * @method void setNetAttackAlarmStatus(integer $NetAttackAlarmStatus) 设置<p>0 新增告警事件默认待处理，1新增告警事件默认已处理，3新增告警事件默认忽略</p>
+ * @method integer getScope() 获取<p>1 全部旗舰版主机，0 Quuids列表主机</p>
+ * @method void setScope(integer $Scope) 设置<p>1 全部旗舰版主机，0 Quuids列表主机</p>
+ * @method array getInstanceIds() 获取<p>自选主机</p>
+ * @method void setInstanceIds(array $InstanceIds) 设置<p>自选主机</p>
+ * @method array getExcludeInstanceIds() 获取<p>自选排除的主机</p>
+ * @method void setExcludeInstanceIds(array $ExcludeInstanceIds) 设置<p>自选排除的主机</p>
+ * @method integer getAutoInclude() 获取<p>新增资产自动包含 0 不包含 1包含</p>
+ * @method void setAutoInclude(integer $AutoInclude) 设置<p>新增资产自动包含 0 不包含 1包含</p>
+ * @method integer getProductType() 获取<p>产品类型 0-主机安全 1-安全中心</p>
+ * @method void setProductType(integer $ProductType) 设置<p>产品类型 0-主机安全 1-安全中心</p>
+ */
+class ModifyNetAttackSettingRequest extends AbstractModel
+{
+    /**
+     * @var integer <p>0 关闭网络攻击检测，1开启网络攻击检测</p>
+     */
+    public $NetAttackEnable;
+
+    /**
+     * @var integer <p>0 新增告警事件默认待处理，1新增告警事件默认已处理，3新增告警事件默认忽略</p>
+     */
+    public $NetAttackAlarmStatus;
+
+    /**
+     * @var integer <p>1 全部旗舰版主机，0 Quuids列表主机</p>
+     */
+    public $Scope;
+
+    /**
+     * @var array <p>自选主机</p>
+     */
+    public $InstanceIds;
+
+    /**
+     * @var array <p>自选排除的主机</p>
+     */
+    public $ExcludeInstanceIds;
+
+    /**
+     * @var integer <p>新增资产自动包含 0 不包含 1包含</p>
+     */
+    public $AutoInclude;
+
+    /**
+     * @var integer <p>产品类型 0-主机安全 1-安全中心</p>
+     */
+    public $ProductType;
+
+    /**
+     * @param integer $NetAttackEnable <p>0 关闭网络攻击检测，1开启网络攻击检测</p>
+     * @param integer $NetAttackAlarmStatus <p>0 新增告警事件默认待处理，1新增告警事件默认已处理，3新增告警事件默认忽略</p>
+     * @param integer $Scope <p>1 全部旗舰版主机，0 Quuids列表主机</p>
+     * @param array $InstanceIds <p>自选主机</p>
+     * @param array $ExcludeInstanceIds <p>自选排除的主机</p>
+     * @param integer $AutoInclude <p>新增资产自动包含 0 不包含 1包含</p>
+     * @param integer $ProductType <p>产品类型 0-主机安全 1-安全中心</p>
+     */
+    function __construct()
+    {
+
+    }
+
+    /**
+     * For internal only. DO NOT USE IT.
+     */
+    public function deserialize($param)
+    {
+        if ($param === null) {
+            return;
+        }
+        if (array_key_exists("NetAttackEnable",$param) and $param["NetAttackEnable"] !== null) {
+            $this->NetAttackEnable = $param["NetAttackEnable"];
+        }
+
+        if (array_key_exists("NetAttackAlarmStatus",$param) and $param["NetAttackAlarmStatus"] !== null) {
+            $this->NetAttackAlarmStatus = $param["NetAttackAlarmStatus"];
+        }
+
+        if (array_key_exists("Scope",$param) and $param["Scope"] !== null) {
+            $this->Scope = $param["Scope"];
+        }
+
+        if (array_key_exists("InstanceIds",$param) and $param["InstanceIds"] !== null) {
+            $this->InstanceIds = $param["InstanceIds"];
+        }
+
+        if (array_key_exists("ExcludeInstanceIds",$param) and $param["ExcludeInstanceIds"] !== null) {
+            $this->ExcludeInstanceIds = $param["ExcludeInstanceIds"];
+        }
+
+        if (array_key_exists("AutoInclude",$param) and $param["AutoInclude"] !== null) {
+            $this->AutoInclude = $param["AutoInclude"];
+        }
+
+        if (array_key_exists("ProductType",$param) and $param["ProductType"] !== null) {
+            $this->ProductType = $param["ProductType"];
+        }
+    }
+}

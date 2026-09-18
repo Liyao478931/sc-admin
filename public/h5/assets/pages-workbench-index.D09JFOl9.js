@@ -1,0 +1,1 @@
+import{_ as a,Y as s,a4 as e,c as t,a5 as r,p as c,i as o}from"./index-DoUx5fAv.js";const d=a({__name:"index",setup:a=>(s(()=>{e(r.HOME,{from:"legacy"})}),(a,s)=>{const e=o;return c(),t(e,{class:"redirect-page"})})},[["__scopeId","data-v-40e1447f"]]);export{d as default};

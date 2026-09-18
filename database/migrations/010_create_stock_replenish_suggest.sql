@@ -1,0 +1,25 @@
+-- 010 库存补货建议单
+CREATE TABLE IF NOT EXISTS stock_replenish_suggest (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  suggest_no VARCHAR(40) NOT NULL,
+  material_id INT NOT NULL DEFAULT 0,
+  material_code VARCHAR(64) DEFAULT '',
+  material_name VARCHAR(128) DEFAULT '',
+  spec VARCHAR(128) DEFAULT '',
+  unit VARCHAR(32) DEFAULT '',
+  current_stock DECIMAL(14,2) DEFAULT 0,
+  safety_stock DECIMAL(14,2) DEFAULT 0,
+  suggest_qty DECIMAL(14,2) DEFAULT 0,
+  supplier_id INT DEFAULT 0,
+  supplier_name VARCHAR(128) DEFAULT '',
+  reason VARCHAR(20) DEFAULT 'low_stock',
+  status TINYINT DEFAULT 0 COMMENT '0待处理 1已确认 2已忽略',
+  confirm_user_id INT DEFAULT 0,
+  confirm_user_name VARCHAR(64) DEFAULT '',
+  confirm_time DATETIME NULL,
+  remark VARCHAR(255) DEFAULT '',
+  create_time DATETIME NULL,
+  update_time DATETIME NULL,
+  KEY idx_status (status),
+  KEY idx_material (material_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='库存补货建议单';

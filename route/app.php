@@ -1,0 +1,5 @@
+<?php
+use think\facade\Route; Route::get('m/<pageKey>', 'app\controller\MobilePreviewController@index'); Route::get('finance-report/<action>', 'app\api\controller\FinanceReportController@<action>') ->middleware(\app\middleware\AuthMiddleware::class); Route::get('receive-transport/<action>', 'app\api\controller\ReceiveTransportController@<action>') ->middleware(\app\middleware\AuthMiddleware::class); Route::post('receive-transport/<action>', 'app\api\controller\ReceiveTransportController@<action>') ->middleware(\app\middleware\AuthMiddleware::class);
+Route::get('stock-replenish/<action>', 'app\api\controller\StockReplenishController@<action>')->middleware(\app\middleware\AuthMiddleware::class);
+Route::get('finance/aging/export', 'app\api\controller\FinanceController@agingExport')->middleware(\app\middleware\AuthMiddleware::class);
+Route::get('safety-dashboard/<action>', 'app\api\controller\SafetyDashboardController@<action>')->middleware(\app\middleware\AuthMiddleware::class);

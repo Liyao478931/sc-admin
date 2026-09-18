@@ -1,0 +1,2 @@
+<?php
+return [ 'mini_app_id' => env('WECHAT_MINI_APPID', ''), 'mini_app_secret' => env('WECHAT_MINI_SECRET', ''), 'mp_app_id' => env('WECHAT_MP_APPID', ''), 'mp_app_secret' => env('WECHAT_MP_SECRET', ''), 'mp_token' => env('WECHAT_MP_TOKEN', ''), 'mp_aes_key' => env('WECHAT_MP_AES_KEY', ''), ]; 

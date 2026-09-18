@@ -1,0 +1,15 @@
+-- 155_add_order_production_fields.sql
+-- 订单↔工单双向关联：business_orders 增加生产状态字段
+-- 说明：ALTER 由执行器（信息架构检查 SHOW COLUMNS）幂等添加，此处仅记录字段定义
+-- 幂等写法，可重复执行
+-- 回滚 down：
+--   ALTER TABLE business_orders
+--     DROP COLUMN production_status, DROP COLUMN work_order_id, DROP COLUMN work_order_no,
+--     DROP COLUMN production_progress, DROP COLUMN actual_completion_date;
+
+-- 字段定义（由 PHP 执行器按列存在性幂等添加）：
+--   production_status    TINYINT NOT NULL DEFAULT 0   COMMENT '生产状态：0未生产 1生产中 2已完成 3已关闭'
+--   work_order_id        INT NOT NULL DEFAULT 0       COMMENT '关联工单ID'
+--   work_order_no        VARCHAR(50) NOT NULL DEFAULT '' COMMENT '关联工单编号（冗余）'
+--   production_progress  DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT '生产进度百分比（由工单同步）'
+--   actual_completion_date DATE DEFAULT NULL          COMMENT '实际完工日期'

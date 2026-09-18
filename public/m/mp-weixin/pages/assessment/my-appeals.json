@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "我的申诉",
+  "usingComponents": {
+    "u-empty": "../../node-modules/uview-plus/components/u-empty/u-empty"
+  }
+}

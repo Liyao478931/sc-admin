@@ -1,0 +1,1 @@
+"use strict";exports.joinPath=function(n,e={}){const t=function(n={}){const e=Object.keys(n).filter(e=>void 0!==n[e]&&null!==n[e]&&""!==n[e]);return 0===e.length?"":"?"+e.map(e=>`${encodeURIComponent(e)}=${encodeURIComponent(n[e])}`).join("&")}(e);return t?n+(n.includes("?")?"&"+t.slice(1):t):n};

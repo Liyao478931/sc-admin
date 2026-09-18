@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据库配置 - 数智管控平台 系统安装</title>
+<link rel="stylesheet" href="/install/css/installer.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="steps">
+      <div class="step done"><span class="dot">✓</span> 环境检测</div>
+      <div class="step-line"></div>
+      <div class="step active"><span class="dot">2</span> 数据库</div>
+      <div class="step-line"></div>
+      <div class="step"><span class="dot">3</span> 管理员</div>
+      <div class="step-line"></div>
+      <div class="step"><span class="dot">4</span> 安装</div>
+    </div>
+    <h1>数据库配置</h1>
+    <div id="msg" class="msg"></div>
+    <form id="dbForm">
+      <div class="form-item">
+        <label>数据库主机</label>
+        <input type="text" name="host" value="127.0.0.1" placeholder="127.0.0.1">
+      </div>
+      <div class="form-item">
+        <label>数据库端口</label>
+        <input type="text" name="port" value="3306" placeholder="3306">
+      </div>
+      <div class="form-item">
+        <label>数据库名称</label>
+        <input type="text" name="name" placeholder="请输入数据库名称（不存在将自动创建）">
+      </div>
+      <div class="form-item">
+        <label>数据库用户名</label>
+        <input type="text" name="user" placeholder="请输入数据库用户名">
+      </div>
+      <div class="form-item">
+        <label>数据库密码</label>
+        <input type="password" name="pass" placeholder="请输入数据库密码">
+      </div>
+      <div class="form-item">
+        <label>数据表前缀</label>
+        <input type="text" name="prefix" value="" disabled placeholder="本系统固定无表前缀">
+        <div class="hint">系统数据表无前缀，无需填写</div>
+      </div>
+      <div class="form-item">
+        <label>Redis 密码</label>
+        <input type="password" name="redis_password" placeholder="Redis 密码（无密码可留空）">
+        <div class="hint">验证码/缓存依赖 Redis，需与服务器 Redis 密码一致（宝塔 Redis 设置可查）</div>
+      </div>
+    </form>
+    <div class="actions">
+      <a class="btn ghost" href="/install/step1">上一步</a>
+      <div>
+        <button class="btn ghost" id="testBtn">测试连接</button>
+        <button class="btn primary" id="nextBtn">下一步</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer">© 2026 数智管控平台</div>
+</div>
+<script>
+var msg = document.getElementById('msg');
+function showMsg(text, ok) {
+  msg.className = 'msg ' + (ok ? 'ok' : 'err');
+  msg.textContent = text;
+}
+document.getElementById('testBtn').addEventListener('click', function () {
+  var data = new URLSearchParams(new FormData(document.getElementById('dbForm'))).toString();
+  fetch('/install/step2', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: data })
+    .then(function (r) { return r.json(); })
+    .then(function (res) {
+      if (res.code === 0) { showMsg('数据库连接成功，配置已保存', true); }
+      else { showMsg(res.msg || '连接失败', false); }
+    })
+    .catch(function () { showMsg('请求失败，请检查网络', false); });
+});
+document.getElementById('nextBtn').addEventListener('click', function () {
+  var btn = this;
+  btn.disabled = true;
+  var data = new URLSearchParams(new FormData(document.getElementById('dbForm'))).toString();
+  fetch('/install/step2', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: data })
+    .then(function (r) { return r.json(); })
+    .then(function (res) {
+      if (res.code === 0) { window.location.href = '/install/step3'; }
+      else { showMsg(res.msg || '数据库连接失败', false); btn.disabled = false; }
+    })
+    .catch(function () { showMsg('请求失败，请检查网络', false); btn.disabled = false; });
+});
+</script>
+</body>
+</html>

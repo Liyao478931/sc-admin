@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "打卡设置",
+  "usingComponents": {
+    "u-switch": "../../node-modules/uview-plus/components/u-switch/u-switch",
+    "u-cell": "../../node-modules/uview-plus/components/u-cell/u-cell",
+    "u-cell-group": "../../node-modules/uview-plus/components/u-cell-group/u-cell-group",
+    "u-tag": "../../node-modules/uview-plus/components/u-tag/u-tag",
+    "u-empty": "../../node-modules/uview-plus/components/u-empty/u-empty",
+    "u-button": "../../node-modules/uview-plus/components/u-button/u-button"
+  }
+}

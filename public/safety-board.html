@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>安全生产专题大屏 - SC数智管控平台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#0d1b2a;color:#e8f0fe;min-height:100vh}
+.topbar{background:linear-gradient(90deg,#0a1420,#16324f);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.08)}
+.topbar h1{font-size:20px;font-weight:700;letter-spacing:2px}
+.topbar h1 span{color:#3aa0ff}
+.topbar .time{font-size:13px;color:#7f9cbf}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px;max-width:1500px;margin:0 auto}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px}
+.card h3{font-size:14px;color:#7f9cbf;margin-bottom:12px;font-weight:500;display:flex;justify-content:space-between}
+.card h3 b{color:#3aa0ff;font-weight:700}
+.num{font-size:34px;font-weight:700;color:#3aa0ff}
+.sub{font-size:13px;color:#7f9cbf;margin-top:6px}
+.row{display:flex;gap:18px;margin-top:12px;flex-wrap:wrap}
+.item{flex:1;min-width:90px}
+.item .k{font-size:12px;color:#7f9cbf}
+.item .v{font-size:20px;font-weight:600;margin-top:4px}
+.wide{grid-column:span 2}
+.chart{height:220px}
+.bar{background:#0f2440;border-radius:6px;height:14px;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#3aa0ff,#22d3ee);border-radius:6px}
+.foot{text-align:center;color:#42597a;font-size:12px;padding:14px}
+@media(max-width:900px){.board{grid-template-columns:repeat(2,1fr)}.wide{grid-column:span 2}}
+</style>
+</head>
+<body>
+<div class="topbar"><h1>安全生产·<span>专题大屏</span></h1><span class="time" id="clock"></span></div>
+<div class="board" id="board"></div>
+<div class="foot">SC 数智管控平台 · 安全监管中心</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+<script>
+var token = localStorage.getItem('sc_admin_token') || '';
+function api(url){
+  var h = {}; if(token) h['Authorization'] = 'Bearer ' + token;
+  return fetch('/api/' + url, {headers:h}).then(function(r){return r.json()}).catch(function(e){return {code:1,msg:String(e)}});
+}
+function card(title, num, sub, extra, wide){
+  return '<div class="card'+(wide?' wide':'')+'"><h3>'+title+'<b>'+ (extra||'') +'</b></h3><div class="num">'+num+'</div>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div>';
+}
+function pct(r){ return (Number(r)||0) + '%'; }
+function render(d){
+  var hz = d.hazard, ins = d.inspection, tr = d.training, dev = d.device, at = d.attendance;
+  var b = document.getElementById('board');
+  b.innerHTML =
+    card('隐患总数', hz.total, '结案率 '+pct(hz.close_rate)+' · 逾期 '+hz.overdue) +
+    card('安全隐患状态', hz.pending, '待处理', 
+      '<div class="row"><div class="item"><div class="k">处理中</div><div class="v">'+hz.processing+'</div></div><div class="item"><div class="k">已整改</div><div class="v">'+hz.resolved+'</div></div><div class="item"><div class="k">已关闭</div><div class="v">'+hz.closed+'</div></div><div class="item"><div class="k">已驳回</div><div class="v">'+hz.rejected+'</div></div></div>') +
+    card('巡检任务', ins.total, '完成率 '+pct(ins.complete_rate)+' · 逾期 '+ins.overdue,
+      '<div class="row"><div class="item"><div class="k">已完成</div><div class="v">'+ins.completed+'</div></div><div class="item"><div class="k">进行中</div><div class="v">'+ins.in_progress+'</div></div><div class="item"><div class="k">待开始</div><div class="v">'+ins.pending+'</div></div></div>') +
+    card('培训计划', tr.total+' 项', '已完成 '+tr.completed,
+      '<div class="bar"><i style="width:'+pct(tr.rate)+'"></i></div><div class="sub">计划完成率 '+pct(tr.rate)+'</div>') +
+    card('设备状态', dev.total+' 台', '运行中 '+dev.running+' · 闲置 '+dev.idle+' · 维修 '+dev.repair) +
+    card('今日考勤', at.today_check+' 人', '已打卡 / 员工总数 '+at.employee_total) +
+    card('隐患月度趋势', '', '近 6 个月新增/关闭', false, true).replace('<div class="num"></div>','<div id="trendChart" class="chart"></div>');
+  var el = document.getElementById('trendChart');
+  if(el && window.echarts){
+    var c = echarts.init(el);
+    c.setOption({
+      backgroundColor:'transparent',
+      tooltip:{trigger:'axis'},
+      legend:{data:['新增隐患','关闭隐患'],textStyle:{color:'#7f9cbf'}},
+      grid:{left:40,right:20,top:30,bottom:24},
+      xAxis:{type:'category',data:d.trend.map(function(t){return t.month}),axisLabel:{color:'#7f9cbf'}},
+      yAxis:{type:'value',minInterval:1,axisLabel:{color:'#7f9cbf'},splitLine:{lineStyle:{color:'rgba(255,255,255,.06)'}}},
+      series:[
+        {name:'新增隐患',type:'bar',data:d.trend.map(function(t){return t.discovered}),itemStyle:{color:'#3aa0ff'}},
+        {name:'关闭隐患',type:'line',data:d.trend.map(function(t){return t.closed}),itemStyle:{color:'#22d3ee'},smooth:true}
+      ]
+    });
+  }
+}
+function clock(){ var n=new Date(); document.getElementById('clock').textContent = n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'); }
+api('safety-dashboard/overview').then(function(j){
+  if(j.code!==0){ document.getElementById('board').innerHTML = '<div class="card wide" style="color:#ff7b7b">加载失败：'+(j.msg||'')+'，请确认已登录后台</div>'; return; }
+  render(j.data);
+});
+clock(); setInterval(clock,1000);
+</script>
+</body>
+</html>

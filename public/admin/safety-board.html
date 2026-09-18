@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>安全生产大屏 · SC数智管控平台</title>
+<style>
+:root{
+  --bg1:#04070f; --bg2:#071527;
+  --panel:rgba(9,24,45,.62); --panel-br:rgba(0,190,255,.22);
+  --cyan:#00d4ff; --blue:#3aa0ff; --teal:#22d3ee;
+  --green:#34d399; --amber:#fbbf24; --red:#f87171;
+  --txt:#e8f4ff; --dim:#7fa6c9; --dim2:#4d7397;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden}
+body{
+  font-family:"Microsoft YaHei","PingFang SC",-apple-system,BlinkMacSystemFont,sans-serif;
+  background:
+    radial-gradient(1200px 700px at 15% -10%, rgba(0,120,255,.16), transparent 60%),
+    radial-gradient(1000px 600px at 110% 110%, rgba(0,212,255,.10), transparent 55%),
+    linear-gradient(160deg,var(--bg1),var(--bg2) 55%,#040a14);
+  color:var(--txt);position:relative;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;
+  background-image:
+    linear-gradient(rgba(0,190,255,.12) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,190,255,.12) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+}
+.header{
+  position:relative;height:64px;display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid rgba(0,190,255,.28);
+  background:linear-gradient(90deg,transparent,rgba(0,120,255,.12),transparent);
+}
+.header h1{font-size:26px;font-weight:700;letter-spacing:6px;color:#fff;text-shadow:0 0 18px rgba(0,212,255,.55)}
+.header h1 small{font-size:13px;color:var(--dim);letter-spacing:2px;margin-left:10px;font-weight:400}
+.header .l,.header .r{position:absolute;top:0;height:100%;display:flex;align-items:center;color:var(--dim);font-size:13px}
+.header .l{left:22px}.header .r{right:22px}
+.header .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
+.fs-btn{
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  background:rgba(0,190,255,.08);border:1px solid rgba(0,190,255,.35);color:var(--cyan);
+  font-size:12px;letter-spacing:1px;padding:6px 12px;border-radius:6px;
+  transition:all .25s;font-family:inherit;line-height:1;
+}
+.fs-btn:hover{background:rgba(0,190,255,.2);box-shadow:0 0 14px rgba(0,212,255,.35)}
+.fs-btn:active{transform:scale(.96)}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+#clock{font-size:15px;color:#cfe9ff;font-variant-numeric:tabular-nums;letter-spacing:1px}
+
+.main{display:grid;grid-template-rows:auto 1fr;gap:12px;padding:12px;height:calc(100% - 64px)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{
+  position:relative;background:var(--panel);border:1px solid var(--panel-br);border-radius:10px;
+  padding:14px 16px;display:flex;flex-direction:column;justify-content:center;
+  box-shadow:inset 0 0 22px rgba(0,120,255,.05),0 4px 22px rgba(0,0,0,.35);
+}
+.kpi::before{content:"";position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:2px solid var(--cyan);border-left:2px solid var(--cyan)}
+.kpi::after{content:"";position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan)}
+.kpi .kv{display:flex;align-items:baseline;gap:8px}
+.kpi .kv .n{font-size:40px;font-weight:800;font-family:"Bahnschrift","DIN Alternate",sans-serif;color:var(--cyan);text-shadow:0 0 22px rgba(0,212,255,.4);line-height:1;font-variant-numeric:tabular-nums}
+.kpi .kv .u{font-size:14px;color:var(--dim)}
+.kpi .kk{font-size:13px;color:var(--dim);letter-spacing:2px;margin-top:8px}
+.kpi .ks{font-size:12px;color:var(--dim2);margin-top:3px}
+.kpi .bar{height:5px;border-radius:3px;background:rgba(0,190,255,.12);margin-top:10px;overflow:hidden}
+.kpi .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--cyan),var(--teal));transition:width .8s}
+
+.board{display:grid;grid-template-columns:1.2fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;min-height:0}
+.panel{
+  position:relative;background:var(--panel);border:1px solid var(--panel-br);border-radius:10px;
+  padding:12px 14px;display:flex;flex-direction:column;min-height:0;
+  box-shadow:inset 0 0 22px rgba(0,120,255,.05),0 4px 22px rgba(0,0,0,.35);
+}
+.panel::before{content:"";position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:2px solid var(--cyan);border-left:2px solid var(--cyan)}
+.panel::after{content:"";position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan)}
+.panel .ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.panel .ph h3{font-size:14px;font-weight:600;letter-spacing:2px;color:#d6ecff;padding-left:10px;position:relative}
+.panel .ph h3::before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:3px;background:linear-gradient(var(--cyan),var(--blue));border-radius:2px}
+.panel .ph .tag{font-size:11px;color:var(--dim2);letter-spacing:1px}
+.panel .ph .num-big{font-size:20px;color:var(--cyan);font-weight:700}
+.chart{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.chart svg{width:100%;height:100%}
+.legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:4px}
+.legend span{font-size:11.5px;color:var(--dim);display:flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+/* 环形 */
+.donut-wrap{display:flex;align-items:center;justify-content:center;gap:16px;flex:1;min-height:0}
+.donut-legend{display:flex;flex-direction:column;gap:5px}
+.donut-legend .dl{font-size:11.5px;color:var(--dim);display:flex;align-items:center;gap:6px}
+.donut-legend .dl i{width:9px;height:9px;border-radius:2px}
+.donut-legend .dl b{color:#d6ecff;font-weight:600;margin-left:auto;padding-left:8px}
+.donut-legend .dl em{font-style:normal;color:var(--dim2);width:36px;text-align:right}
+
+/* 状态列表 */
+.statrows{display:flex;flex-direction:column;gap:8px;flex:1;justify-content:center}
+.srow{display:flex;align-items:center;gap:10px}
+.srow .sk{width:56px;font-size:12px;color:var(--dim);flex:none}
+.srow .track{flex:1;height:12px;border-radius:6px;background:rgba(0,190,255,.10);overflow:hidden;position:relative}
+.srow .track i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--cyan),var(--teal));transition:width .8s}
+.srow .track.amber i{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+.srow .track.red i{background:linear-gradient(90deg,#f87171,#ef4444)}
+.srow .sv{width:34px;font-size:13px;color:#d6ecff;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;flex:none}
+
+.empty{color:var(--dim2);font-size:12px;text-align:center;padding:18px 0;flex:1;display:flex;align-items:center;justify-content:center}
+
+@media(max-width:1200px){.board{grid-template-columns:1fr 1fr}.kpis{grid-template-columns:repeat(3,1fr)}}
+
+.pseudo-fs{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;z-index:99999!important;overflow:auto;background:#040a14}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="l"><span class="dot"></span>SC 数智管控平台 · 安全监管中心</div>
+  <h1>安全生产<small>· 专题大屏</small></h1>
+  <div class="r"><button class="fs-btn" id="fsBtn" onclick="toggleFs()" title="切换全屏"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span>全屏</span></button><span id="clock">--</span></div>
+</div>
+
+<div class="main">
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kv"><span class="n" id="hzN">--</span><span class="u">项</span></div>
+      <div class="kk">隐患总数</div>
+      <div class="ks" id="hzS">结案率 --% · 逾期 --</div>
+      <div class="bar"><i id="hzBar" style="width:0%"></i></div>
+    </div>
+    <div class="kpi">
+      <div class="kv"><span class="n" id="insN">--</span><span class="u">项</span></div>
+      <div class="kk">巡检任务</div>
+      <div class="ks" id="insS">完成率 --% · 逾期 --</div>
+      <div class="bar"><i id="insBar" style="width:0%"></i></div>
+    </div>
+    <div class="kpi">
+      <div class="kv"><span class="n" id="trN">--</span><span class="u">项</span></div>
+      <div class="kk">培训计划</div>
+      <div class="ks" id="trS">已完成 -- 项</div>
+      <div class="bar"><i id="trBar" style="width:0%"></i></div>
+    </div>
+    <div class="kpi">
+      <div class="kv"><span class="n" id="devN">--</span><span class="u">台</span></div>
+      <div class="kk">设备总数</div>
+      <div class="ks" id="devS">运行 -- · 闲置 -- · 维修 --</div>
+      <div class="bar"><i id="devBar" style="width:0%"></i></div>
+    </div>
+    <div class="kpi">
+      <div class="kv"><span class="n" id="atN">--</span><span class="u">人</span></div>
+      <div class="kk">今日打卡</div>
+      <div class="ks" id="atS">员工总数 -- 人</div>
+      <div class="bar"><i id="atBar" style="width:0%"></i></div>
+    </div>
+  </div>
+
+  <div class="board">
+    <div class="panel" style="grid-row:span 2">
+      <div class="ph"><h3>隐患月度趋势</h3><span class="tag">近 6 个月 · 新增 / 关闭</span></div>
+      <div class="legend"><span><i style="background:var(--cyan)"></i>新增隐患</span><span><i style="background:var(--teal)"></i>关闭隐患</span></div>
+      <div id="trendChart" class="chart"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h3>隐患状态分布</h3><span class="num-big" id="hzStateTotal">--</span></div>
+      <div class="statrows" id="hzStates"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h3>巡检任务状态</h3><span class="num-big" id="insStateTotal">--</span></div>
+      <div class="statrows" id="insStates"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h3>设备状态</h3><span class="num-big" id="devTotal2">--</span></div>
+      <div class="statrows" id="devStates"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h3>考勤与培训</h3></div>
+      <div class="statrows" id="miscRows"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function fsState(){
+  return !!(document.fullscreenElement||document.webkitFullscreenElement)||document.documentElement.classList.contains('pseudo-fs');
+}
+function enterPseudoFs(){document.documentElement.classList.add('pseudo-fs')}
+function exitPseudoFs(){document.documentElement.classList.remove('pseudo-fs')}
+function enterFs(){
+  var el=document.documentElement;
+  var p=el.requestFullscreen||el.webkitRequestFullscreen;
+  if(!p){enterPseudoFs();return}
+  try{
+    var pr=p.call(el);
+    if(pr&&pr.catch){pr.catch(function(){enterPseudoFs()})}
+    else{setTimeout(function(){if(!(document.fullscreenElement||document.webkitFullscreenElement))enterPseudoFs()},350)}
+  }catch(e){enterPseudoFs()}
+}
+function exitFs(){
+  var e=document.exitFullscreen||document.webkitExitFullscreen;
+  if(e){try{e.call(document)}catch(x){}}
+  exitPseudoFs();
+}
+function toggleFs(){
+  if(fsState()) exitFs(); else enterFs();
+}
+function updateFsBtn(){
+  var b=document.getElementById('fsBtn');if(!b)return;
+  b.querySelector('span').textContent=fsState()?'退出全屏':'全屏';
+}
+document.addEventListener('fullscreenchange',updateFsBtn);
+document.addEventListener('webkitfullscreenchange',updateFsBtn);
+
+(function(){
+var TOKEN = localStorage.getItem('sc_admin_token') || '';
+function api(url){
+  var h={};
+  if(TOKEN) h['Authorization']='Bearer '+TOKEN;
+  return fetch('/api/'+url,{headers:h}).then(function(r){return r.json()}).catch(function(e){return {code:1,msg:String(e)}});
+}
+var C=['#00d4ff','#3aa0ff','#fbbf24','#f87171','#34d399','#a78bfa'];
+function linePath(xs,ys){var p='';for(var i=0;i<xs.length;i++){p+=(i?'L':'M')+xs[i].toFixed(1)+','+ys[i].toFixed(1)}return p}
+function areaPath(xs,ys,b){return linePath(xs,ys)+'L'+xs[xs.length-1].toFixed(1)+','+b+'L'+xs[0].toFixed(1)+','+b+'Z'}
+
+function barLine(el, labels, bar, line){
+  if(!el) return;
+  var W=800,H=300,pl=42,pr=10,pt=18,pb=28;
+  var max=0; bar.forEach(function(v){if(v>max)max=v}); line.forEach(function(v){if(v>max)max=v});
+  if(max===0) max=1;
+  var iw=W-pl-pr, ih=H-pt-pb, n=labels.length, bw=iw/n;
+  var xAt=function(i){return pl+bw*i+bw/2};
+  var yAt=function(v){return pt+ih-(v/max)*ih};
+  var h='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">';
+  for(var g=0;g<=4;g++){
+    var gy=pt+ih*g/4;
+    h+='<line x1="'+pl+'" y1="'+gy+'" x2="'+(W-pr)+'" y2="'+gy+'" stroke="rgba(0,190,255,.12)"/>';
+    h+='<text x="'+(pl-6)+'" y="'+(gy+4)+'" fill="#4d7397" font-size="10" text-anchor="end">'+Math.round(max*(4-g)/4)+'</text>';
+  }
+  for(var i=0;i<n;i++){
+    var x=pl+bw*i+bw*0.12, w=bw*0.5, hh=(bar[i]/max)*ih;
+    h+='<rect x="'+x.toFixed(1)+'" y="'+(yAt(bar[i])).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+Math.max(hh,1).toFixed(1)+'" rx="2" fill="#00d4ff" opacity=".85"/>';
+    h+='<rect x="'+x.toFixed(1)+'" y="'+(yAt(bar[i])).toFixed(1)+'" width="'+w.toFixed(1)+'" height="3" fill="#fff" opacity=".3"/>';
+  }
+  var xs=[],ys=[];
+  for(var i=0;i<n;i++){xs.push(xAt(i));ys.push(yAt(line[i]))}
+  h+='<path d="'+areaPath(xs,ys,pt+ih)+'" fill="#22d3ee" opacity=".12"/>';
+  h+='<path d="'+linePath(xs,ys)+'" fill="none" stroke="#22d3ee" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>';
+  for(var i=0;i<n;i++){h+='<circle cx="'+xs[i].toFixed(1)+'" cy="'+ys[i].toFixed(1)+'" r="2.5" fill="#22d3ee"/>'}
+  var step=n>10?Math.ceil(n/8):1;
+  for(var i=0;i<n;i++){
+    if(i%step!==0&&i!==n-1) continue;
+    h+='<text x="'+xAt(i).toFixed(1)+'" y="'+(H-6)+'" fill="#7fa6c9" font-size="9.5" text-anchor="middle">'+String(labels[i]).replace('-','/')+'</text>';
+  }
+  h+='</svg>';
+  el.innerHTML=h;
+}
+
+function stateRows(el, items){
+  if(!el) return;
+  if(!items || !items.length){ el.innerHTML='<div class="empty">暂无数据</div>'; return; }
+  var max=1; items.forEach(function(it){if(Number(it.value)>max)max=Number(it.value)});
+  var h='';
+  items.forEach(function(it){
+    var v=Number(it.value)||0, p=Math.round(v/max*100);
+    var cls='' ; if(it.cls) cls=it.cls;
+    h+='<div class="srow"><span class="sk">'+it.name+'</span><span class="track '+cls+'"><i style="width:'+p+'%"></i></span><span class="sv">'+v+'</span></div>';
+  });
+  el.innerHTML=h;
+}
+
+function render(d){
+  if(!d) return;
+  var hz=d.hazard||{}, ins=d.inspection||{}, tr=d.training||{}, dev=d.device||{}, at=d.attendance||{};
+  set('hzN',hz.total!==undefined?hz.total:'--');
+  set('hzS','结案率 '+(hz.close_rate!==undefined?hz.close_rate:'--')+'% · 逾期 '+(hz.overdue!==undefined?hz.overdue:'--'));
+  if(hz.close_rate!==undefined) set('hzBar',hz.close_rate+'%');
+  set('insN',ins.total!==undefined?ins.total:'--');
+  set('insS','完成率 '+(ins.complete_rate!==undefined?ins.complete_rate:'--')+'% · 逾期 '+(ins.overdue!==undefined?ins.overdue:'--'));
+  if(ins.complete_rate!==undefined) set('insBar',ins.complete_rate+'%');
+  set('trN',tr.total!==undefined?tr.total:'--');
+  set('trS','已完成 '+(tr.completed!==undefined?tr.completed:'--')+' 项');
+  if(tr.rate!==undefined) set('trBar',tr.rate+'%');
+  set('devN',dev.total!==undefined?dev.total:'--');
+  set('devS','运行 '+(dev.running!==undefined?dev.running:'--')+' · 闲置 '+(dev.idle!==undefined?dev.idle:'--')+' · 维修 '+(dev.repair!==undefined?dev.repair:'--'));
+  if(dev.total) set('devBar',Math.round((Number(dev.running)||0)/dev.total*100)+'%');
+  set('atN',at.today_check!==undefined?at.today_check:'--');
+  set('atS','员工总数 '+(at.employee_total!==undefined?at.employee_total:'--')+' 人');
+  if(at.employee_total) set('atBar',Math.round((Number(at.today_check)||0)/at.employee_total*100)+'%');
+
+  // trend
+  var td=d.trend||[];
+  if(td.length){
+    var labels=td.map(function(t){return t.month}), f=td.map(function(t){return t.discovered}), c=td.map(function(t){return t.closed});
+    barLine(document.getElementById('trendChart'), labels, f, c);
+  } else {
+    var tc=document.getElementById('trendChart'); if(tc) tc.innerHTML='<div class="empty">暂无数据</div>';
+  }
+  // hazard states
+  set('hzStateTotal', hz.total!==undefined?hz.total:'--');
+  stateRows(document.getElementById('hzStates'), [
+    {name:'待处理',value:hz.pending||0},{name:'处理中',value:hz.processing||0},
+    {name:'已整改',value:hz.resolved||0},{name:'已关闭',value:hz.closed||0,cls:'amber'},{name:'已驳回',value:hz.rejected||0,cls:'red'}
+  ]);
+  // inspection states
+  set('insStateTotal', ins.total!==undefined?ins.total:'--');
+  stateRows(document.getElementById('insStates'), [
+    {name:'待开始',value:ins.pending||0},{name:'进行中',value:ins.in_progress||0},
+    {name:'已完成',value:ins.completed||0},{name:'已逾期',value:ins.overdue||0,cls:'red'},{name:'已取消',value:ins.cancelled||0,cls:'amber'}
+  ]);
+  // device states
+  set('devTotal2', dev.total!==undefined?dev.total:'--');
+  stateRows(document.getElementById('devStates'), [
+    {name:'运行中',value:dev.running||0},{name:'闲置',value:dev.idle||0},{name:'维修中',value:dev.repair||0,cls:'red'}
+  ]);
+  // misc rows
+  var misc=[];
+  misc.push({name:'培训完成',value:tr.rate!==undefined?tr.rate+'%':'--'});
+  misc.push({name:'已完成培训',value:tr.completed||0});
+  misc.push({name:'今日打卡',value:at.today_check||0});
+  misc.push({name:'员工总数',value:at.employee_total||0});
+  var me=document.getElementById('miscRows');
+  var mh='';
+  misc.forEach(function(it){
+    mh+='<div class="srow"><span class="sk">'+it.name+'</span><span class="sv" style="width:auto;text-align:left">'+it.value+'</span></div>';
+  });
+  if(me) me.innerHTML=mh;
+}
+function set(id,v){var e=document.getElementById(id);if(e)e.textContent=v}
+
+function loadAll(){
+  api('safety-dashboard/overview').then(function(j){
+    if(j.code!==0){ var b=document.getElementById('trendChart'); if(b) b.innerHTML='<div class="empty">加载失败：'+(j.msg||'')+'，请确认已登录后台</div>'; return; }
+    render(j.data);
+  });
+}
+function clock(){
+  var n=new Date();
+  var s=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  var e=document.getElementById('clock'); if(e) e.textContent=s;
+}
+loadAll();
+clock(); setInterval(clock,1000);
+setInterval(loadAll,60000);
+})();
+</script>
+</body>
+</html>

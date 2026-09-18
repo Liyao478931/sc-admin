@@ -1,0 +1,2 @@
+<?php
+ return [ 'name' => 'PHPSESSID', 'var_session_id' => '', 'type' => 'file', 'store' => null, 'expire' => 1440, 'prefix' => '', ]; 

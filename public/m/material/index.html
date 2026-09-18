@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>物料详情</title>
+<style>
+:root {
+  --brand: #409EFF;
+  --bg: #f2f4f8;
+  --card: #ffffff;
+  --radius: 14px;
+  --shadow: 0 4px 16px rgba(31,45,61,.06);
+  --text: #1f2d3d;
+  --sub: #909399;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { background:var(--bg); font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif; color:var(--text); font-size:14px; min-height:100vh; }
+.page { max-width:480px; margin:0 auto; padding:14px 14px 48px; }
+.card { background:var(--card); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:var(--shadow); }
+.mat-head { text-align:center; padding:6px 0 2px; }
+.dh-status { margin-bottom:10px; }
+.status-tag { display:inline-flex; align-items:center; padding:4px 13px; border-radius:999px; font-size:12px; font-weight:600; line-height:1; }
+.mat-name { font-size:21px; font-weight:700; margin-bottom:6px; }
+.mat-code { color:var(--sub); font-size:12px; }
+.section-title { display:flex; align-items:center; font-size:15px; font-weight:600; margin-bottom:12px; }
+.section-title::before { content:''; width:4px; height:14px; border-radius:2px; background:var(--brand); margin-right:8px; }
+.info-list { display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
+.info-item { display:flex; padding:7px 0; font-size:13px; border-bottom:1px solid #f5f7fa; }
+.info-item.full { grid-column:1 / -1; }
+.info-item .lb { color:var(--sub); width:74px; flex-shrink:0; }
+.info-item .val { color:var(--text); word-break:break-all; }
+.info-item .val.warn { color:#e8590c; font-weight:600; }
+.info-item .val.danger { color:#e03131; font-weight:600; }
+.info-item .val.good { color:#2f9e44; font-weight:600; }
+.info-item .val.price { color:var(--brand); font-weight:700; font-size:14px; }
+.remark-text { font-size:13px; line-height:1.8; color:#4b5a6c; }
+.state-box { text-align:center; padding:90px 24px; color:var(--sub); }
+.spinner { width:34px;height:34px;border:3px solid #e3e8f0;border-top-color:var(--brand);border-radius:50%;margin:0 auto 16px;animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.state-emoji { font-size:44px; margin-bottom:12px; }
+.footer { text-align:center; color:#c0c4cc; font-size:12px; padding:22px 0 8px; line-height:1.7; }
+.btn { display:block; width:120px; margin:18px auto 0; padding:11px; border:none; border-radius:999px; background:var(--brand); color:#fff; font-size:14px; font-weight:600; text-align:center; cursor:pointer; }
+.live-tip { text-align:center; font-size:11px; color:#a8b2c0; padding:6px 0 2px; display:flex; align-items:center; justify-content:center; gap:5px; }
+.live-dot { width:6px; height:6px; border-radius:50%; background:#2f9e44; display:inline-block; animation:pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div id="app">
+    <div id="state-loading" class="state-box"><div class="spinner"></div><div>加载中...</div></div>
+    <div id="state-error" class="state-box" style="display:none">
+      <div class="state-emoji">😕</div>
+      <div id="error-msg">物料不存在或加载失败</div>
+      <button class="btn" onclick="location.reload()">重试</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var API_BASE = window.location.origin;
+var REFRESH_MS = 30000;
+var timer = null;
+function getMaterialCode() {
+  var m = location.pathname.match(/\/m\/material\/([^\/?]+)/);
+  return m ? decodeURIComponent(m[1]) : (new URLSearchParams(location.search).get('code') || '');
+}
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+function fmtMoney(v) { return (Number(v) || 0).toFixed(2); }
+function fmtNum(v) { return Number(v || 0).toLocaleString('zh-CN'); }
+function kv(label, value, full, cls) {
+  return '<div class="info-item' + (full ? ' full' : '') + '"><div class="lb">' + esc(label) + '</div><div class="val' + (cls ? ' ' + cls : '') + '">' + esc(value == null || value === '' ? '-' : value) + '</div></div>';
+}
+function stockClass(d) {
+  if (d.current_stock <= 0) return 'danger';
+  if (d.stock_warning) return 'warn';
+  return 'good';
+}
+function render(d) {
+  var st = d.status === 1 ? { label: '启用', color: '#2f9e44', bg: 'rgba(47,158,68,.12)' } : { label: '停用', color: '#868e96', bg: 'rgba(134,142,150,.14)' };
+  var remarkHtml = d.remark ? '<div class="card"><div class="section-title">备注</div><div class="remark-text">' + esc(d.remark) + '</div></div>' : '';
+  var html =
+    '<div class="card"><div class="mat-head">' +
+      '<div class="dh-status"><span class="status-tag" style="background:' + st.bg + ';color:' + st.color + '">' + st.label + '</span></div>' +
+      '<div class="mat-name">' + esc(d.material_name) + '</div>' +
+      '<div class="mat-code">编码：' + esc(d.material_code) + '</div>' +
+    '</div></div>' +
+    '<div class="card"><div class="section-title">基本信息</div><div class="info-list">' +
+      kv('物料类型', d.material_type) + kv('物料分类', d.category_name) +
+      kv('规格型号', d.specification) + kv('单位', d.unit) +
+      kv('存放货位', d.location_name) + kv('默认供应商', d.supplier_name) +
+    '</div></div>' +
+    '<div class="card"><div class="section-title">库存信息</div><div class="info-list">' +
+      kv('当前库存', fmtNum(d.current_stock) + (d.unit ? ' ' + d.unit : ''), false, stockClass(d)) +
+      kv('安全库存', fmtNum(d.safety_stock) + (d.unit ? ' ' + d.unit : '')) +
+      kv('最大库存', fmtNum(d.max_stock) + (d.unit ? ' ' + d.unit : '')) +
+      kv('最小库存', fmtNum(d.min_stock) + (d.unit ? ' ' + d.unit : '')) +
+      (d.stock_warning ? kv('库存状态', '低于安全库存，请及时补货', true, 'danger') : kv('库存状态', '库存充足', true, 'good')) +
+    '</div></div>' +
+    '<div class="card"><div class="section-title">价格信息</div><div class="info-list">' +
+      kv('参考单价', '¥ ' + fmtMoney(d.unit_price), false, 'price') +
+      kv('参考成本', '¥ ' + fmtMoney(d.reference_cost)) +
+      kv('平均成本', '¥ ' + fmtMoney(d.avg_cost_price)) +
+      kv('库存总价', '¥ ' + fmtMoney(d.total_price), false, 'price') +
+    '</div></div>' +
+    remarkHtml +
+    '<div class="live-tip"><span class="live-dot"></span>数据实时更新（每30秒自动刷新）</div>' +
+    '<div class="footer">华能装备 · 物料管理系统</div>';
+  document.getElementById('state-loading').style.display = 'none';
+  document.getElementById('state-error').style.display = 'none';
+  document.getElementById('app').innerHTML = html;
+}
+function showError(msg) {
+  document.getElementById('state-loading').style.display = 'none';
+  document.getElementById('state-error').style.display = 'block';
+  document.getElementById('error-msg').textContent = msg;
+}
+function load() {
+  var code = getMaterialCode();
+  if (!code) { showError('缺少物料编码'); return; }
+  fetch(API_BASE + '/api/warehouse/setting/material/public/detail?material_code=' + encodeURIComponent(code))
+    .then(function (r) { return r.json(); })
+    .then(function (r) {
+      if (r && r.code === 0 && r.data) render(r.data);
+      else showError(r && r.msg ? r.msg : '物料不存在');
+    })
+    .catch(function () { showError('网络异常，请稍后重试'); });
+}
+load();
+// 实时刷新
+timer = setInterval(function () { load(); }, REFRESH_MS);
+</script>
+</body>
+</html>

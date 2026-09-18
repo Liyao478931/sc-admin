@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "搜索",
+  "usingComponents": {
+    "u-input": "../../node-modules/uview-plus/components/u-input/u-input"
+  }
+}
