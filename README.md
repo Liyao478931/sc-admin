@@ -59,6 +59,22 @@
 
 ---
 
+### 📸 界面预览
+
+| 登录页 | 业务驾驶舱 |
+|---|---|
+| ![登录页](https://gitee.com/li-yao11111/sc-admin/raw/master/docs/screenshots/admin-login.png) | ![业务驾驶舱](https://gitee.com/li-yao11111/sc-admin/raw/master/docs/screenshots/biz-cockpit.png) |
+
+| 安全驾驶舱 | 安全生产大屏 |
+|---|---|
+| ![安全驾驶舱](https://gitee.com/li-yao11111/sc-admin/raw/master/docs/screenshots/safety-cockpit.png) | ![安全生产大屏](https://gitee.com/li-yao11111/sc-admin/raw/master/docs/screenshots/safety-board.png) |
+
+| 系统监控 |
+|---|
+| ![系统监控](https://gitee.com/li-yao11111/sc-admin/raw/master/docs/screenshots/system-monitor.png) |
+
+---
+
 ### 🧩 功能特性
 
 #### 管理后台（Web 端）
