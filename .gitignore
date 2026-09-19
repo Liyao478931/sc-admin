@@ -27,3 +27,8 @@ dist/
 
 # ===== Composer 依赖（安装时 composer install 生成） =====
 vendor/
+
+# ===== 敏感/内部文件（不入库） =====
+database.sql
+app_backup.enc
+code_sync.php
