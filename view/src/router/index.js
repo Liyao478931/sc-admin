@@ -44,6 +44,8 @@ const routes = [
     children: [
       { path: 'dashboard', name: 'Dashboard', component: () => import('../views/dashboard/Index.vue'), meta: { title: '控制台', titleKey: 'nav.dashboard' } },
       { path: 'announcement', name: 'Announcement', component: () => import('../views/system/announcement/index.vue'), meta: { title: '公告管理', permission: 'announcement:view', requireAuth: true } },
+      { path: 'survey/list', name: 'SurveyList', component: () => import('../views/survey/index.vue'), meta: { title: '问卷管理', icon: 'el-icon-document-checked', permission: 'survey:view', requireAuth: true } },
+      { path: 'survey/stats', name: 'SurveyStats', component: () => import('../views/survey/stats.vue'), meta: { title: '问卷统计', icon: 'el-icon-data-analysis', permission: 'survey:stats', requireAuth: true } },
       { path: 'profile', name: 'Profile', component: () => import('../views/profile/Index.vue'), meta: { title: '个人中心', titleKey: 'navbar.profile' } },
       { path: 'organization', name: 'Organization', component: () => import('../views/settings/Organization.vue'), meta: { title: '组织架构' } },
       { path: 'profiles', name: 'Profiles', component: () => import('../views/hr/Profiles.vue'), meta: { title: '员工档案' } },
