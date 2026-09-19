@@ -41,11 +41,13 @@
         <el-table-column prop="create_time" label="创建时间" width="160">
           <template slot-scope="{ row }">{{ row.create_time }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="270" fixed="right">
+        <el-table-column label="操作" width="340" fixed="right">
           <template slot-scope="{ row }">
             <el-button v-if="hasPerm('survey:edit')" type="text" size="small" @click="openEdit(row)">编辑</el-button>
             <el-button v-if="hasPerm('survey:edit')" type="text" size="small" @click="doToggle(row)">{{ row.status === 1 ? '停止' : '发布' }}</el-button>
             <el-button v-if="hasPerm('survey:stats')" type="text" size="small" @click="goStats(row)">统计</el-button>
+            <el-button type="text" size="small" icon="el-icon-link" @click="goFill(row)">链接</el-button>
+            <el-button v-if="hasPerm('survey:add')" type="text" size="small" icon="el-icon-copy-document" @click="doCopy(row)">复制</el-button>
             <el-button v-if="hasPerm('survey:export')" type="text" size="small" @click="doExport(row)">导出</el-button>
             <el-button v-if="hasPerm('survey:delete')" type="text" size="small" class="danger" @click="doDelete(row)">删除</el-button>
           </template>
@@ -135,7 +137,7 @@
 </template>
 
 <script>
-import { getSurveyList, getSurveyDetail, saveSurvey, toggleSurvey, deleteSurvey, exportSurveyCsv } from '@/api/survey'
+import { getSurveyList, getSurveyDetail, saveSurvey, toggleSurvey, deleteSurvey, exportSurveyCsv, copySurvey } from '@/api/survey'
 
 export default {
   name: 'SurveyAdmin',
@@ -271,8 +273,26 @@ export default {
         window.URL.revokeObjectURL(url)
       } catch (e) { this.$message.error('导出失败') }
     },
+    async doCopy(row) {
+      const defaultTitle = (row.title || '') + '（副本）'
+      try {
+        const { value } = await this.$prompt('请输入复制后的问卷标题，复制后请修改标题再发布：', '复制问卷「' + row.title + '」', {
+          inputValue: defaultTitle,
+          confirmButtonText: '复制',
+          cancelButtonText: '取消',
+          inputValidator: v => (v && v.trim() ? true : '标题不能为空'),
+        })
+        const r = await copySurvey({ id: row.id, title: value.trim() })
+        if (r.code === 0) { this.$message.success(r.msg || '复制成功'); this.load() }
+        else this.$message.error(r.msg || '复制失败')
+      } catch (e) { /* 用户取消 */ }
+    },
     goStats(row) {
       this.$router.push({ path: '/survey/stats', query: { id: row.id } })
+    },
+    goFill(row) {
+      const base = window.location.origin || (window.location.protocol + '//' + window.location.host)
+      window.open(base + '/fill.html?id=' + row.id, '_blank')
     },
   },
 }

@@ -8,5 +8,6 @@ export function getSurveyDetail(id) { return request({ url: '/survey/detail', me
 export function saveSurvey(data) { return request({ url: '/survey/save', method: 'post', data }) }
 export function toggleSurvey(data) { return request({ url: '/survey/toggle', method: 'post', data }) }
 export function deleteSurvey(id) { return request({ url: '/survey/delete', method: 'post', data: { id } }) }
+export function copySurvey(data) { return request({ url: '/survey/copy', method: 'post', data }) }
 export function getSurveyStats(id) { return request({ url: '/survey/stats', method: 'get', params: { id } }) }
 export function exportSurveyCsv(id) { return request({ url: '/survey/export', method: 'get', params: { id }, responseType: 'blob' }) }

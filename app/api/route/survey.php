@@ -7,6 +7,7 @@ Route::get('survey/detail', 'SurveyController/detail')->middleware(\app\middlewa
 Route::post('survey/save', 'SurveyController/save')->middleware(\app\middleware\AuthMiddleware::class);
 Route::post('survey/toggle', 'SurveyController/toggle')->middleware(\app\middleware\AuthMiddleware::class);
 Route::post('survey/delete', 'SurveyController/delete')->middleware(\app\middleware\AuthMiddleware::class);
+Route::post('survey/copy', 'SurveyController/copy')->middleware(\app\middleware\AuthMiddleware::class);
 Route::get('survey/stats', 'SurveyController/stats')->middleware(\app\middleware\AuthMiddleware::class);
 Route::get('survey/export', 'SurveyController/export')->middleware(\app\middleware\AuthMiddleware::class);
 
