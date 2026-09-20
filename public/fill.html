@@ -97,6 +97,17 @@ function showError(title, msg) {
   document.getElementById('errMsg').textContent = msg;
 }
 
+function getCookie(name) {
+  var m = document.cookie.match('(^|;)\\s*' + name + '=([^;]+)');
+  return m ? decodeURIComponent(m[2]) : '';
+}
+function setCookie(name, val, days) {
+  var d = new Date();
+  d.setTime(d.getTime() + (days || 365) * 24 * 60 * 60 * 1000);
+  document.cookie = name + '=' + encodeURIComponent(val) + ';expires=' + d.toUTCString() + ';path=/';
+}
+function filledCookieName() { return 'survey_filled_' + SURVEY_ID; }
+
 function showThanks() {
   document.getElementById('header').style.display = 'none';
   document.getElementById('qWrap').style.display = 'none';
@@ -201,7 +212,10 @@ function submitSurvey() {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: 'survey_id=' + SURVEY.id + '&answers=' + encodeURIComponent(JSON.stringify(answers))
   }).then(function(r){ return r.json(); }).then(function(d){
-    if (d.ok || d.code === 0) showThanks();
+    if (d.ok || d.code === 0) {
+      setCookie(filledCookieName(), '1', 365);
+      showThanks();
+    }
     else { toast(d.msg || '提交失败，请重试'); btn.disabled = false; }
   }).catch(function(){ toast('网络错误，请重试'); btn.disabled = false; });
 }
@@ -210,8 +224,17 @@ function submitSurvey() {
 fetch('/api/survey/view?id=' + SURVEY_ID)
   .then(function(r){ return r.json(); })
   .then(function(d){
-    if (d.code === 0) { SURVEY = d.data; render(); }
-    else showError('无法填写', d.msg || '问卷不存在或已结束。');
+    if (d.code === 0) {
+      SURVEY = d.data;
+      // 限填一次：前端先检查 Cookie，已填过直接提示
+      if (SURVEY.limit_once == 1 && getCookie(filledCookieName()) === '1') {
+        showError('您已填写过', '本问卷每人限填一次，感谢您的参与！');
+        return;
+      }
+      render();
+    } else {
+      showError('无法填写', d.msg || '问卷不存在或已结束。');
+    }
   })
   .catch(function(){ showError('无法填写', '网络错误，请稍后重试。'); });
 </script>
